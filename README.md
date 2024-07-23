@@ -4,11 +4,11 @@ This is the interpreter from the book [Writing A Compiler In Go](https://compile
 
 ## Progress
 
-- [ ] Introduction
-  - [ ] Evolving Monkey
-    - [ ] The Past and Present
-    - [ ] The Future
-  - [ ] Use This Book
+- [x] Introduction
+  - [x] Evolving Monkey
+    - [x] The Past and Present
+    - [x] The Future
+  - [x] Use This Book
 - [ ] 1. Compilers & Virtual Machines
   - [ ] Compilers
   - [ ] Virtual and Real Machines
