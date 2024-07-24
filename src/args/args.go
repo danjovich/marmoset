@@ -7,12 +7,15 @@ import (
 )
 
 const (
-	VERBOSE   = "-v"
-	VERBOSE_V = "--verbose"
+	VERBOSE     = "-v"
+	VERBOSE_V   = "--verbose"
+	INTERPRET   = "-i"
+	INTERPRET_V = "--interpret"
 )
 
 type Args struct {
-	Verbose bool
+	Verbose        bool
+	UseInterpreter bool
 }
 
 func New() *Args {
@@ -43,6 +46,9 @@ func (args *Args) parseArg(arg string, value string) {
 	case VERBOSE, VERBOSE_V:
 		assertHasNoValue(arg, value)
 		args.Verbose = true
+	case INTERPRET, INTERPRET_V:
+		assertHasNoValue(arg, value)
+		args.UseInterpreter = true
 	default:
 		panic(fmt.Sprintf("unknown argument %s", arg))
 	}

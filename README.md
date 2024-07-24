@@ -24,8 +24,8 @@ This is the interpreter from the book [Writing A Compiler In Go](https://compile
     - [x] Bytecode, Disassemble!
     - [x] Back to the Task at Hand
     - [x] Powering On the Machine
-  - [ ] Adding on the Stack
-  - [ ] Hooking up the REPL
+  - [x] Adding on the Stack
+  - [x] Hooking up the REPL
 - [ ] 3. Compiling Expressions
   - [ ] Cleaning Up the Stack
   - [ ] Infix Expressions
