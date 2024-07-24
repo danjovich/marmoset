@@ -18,12 +18,12 @@ This is the interpreter from the book [Writing A Compiler In Go](https://compile
     - [x] Bytecode
   - [x] What We’re Going to Do, or: the Duality of VM and Compiler
 - [ ] 2. Hello Bytecode!
-  - [ ] First Instructions
-    - [ ] Starting With Bytes
-    - [ ] The Smallest Compiler
-    - [ ] Bytecode, Disassemble!
-    - [ ] Back to the Task at Hand
-    - [ ] Powering On the Machine
+  - [x] First Instructions
+    - [x] Starting With Bytes
+    - [x] The Smallest Compiler
+    - [x] Bytecode, Disassemble!
+    - [x] Back to the Task at Hand
+    - [x] Powering On the Machine
   - [ ] Adding on the Stack
   - [ ] Hooking up the REPL
 - [ ] 3. Compiling Expressions
