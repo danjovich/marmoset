@@ -9,14 +9,14 @@ This is the interpreter from the book [Writing A Compiler In Go](https://compile
     - [x] The Past and Present
     - [x] The Future
   - [x] Use This Book
-- [ ] 1. Compilers & Virtual Machines
-  - [ ] Compilers
-  - [ ] Virtual and Real Machines
-    - [ ] Real Machines
-    - [ ] What Is a Virtual Machine?
-    - [ ] Why Build One?
-    - [ ] Bytecode
-  - [ ] What We’re Going to Do, or: the Duality of VM and Compiler
+- [x] 1. Compilers & Virtual Machines
+  - [x] Compilers
+  - [x] Virtual and Real Machines
+    - [x] Real Machines
+    - [x] What Is a Virtual Machine?
+    - [x] Why Build One?
+    - [x] Bytecode
+  - [x] What We’re Going to Do, or: the Duality of VM and Compiler
 - [ ] 2. Hello Bytecode!
   - [ ] First Instructions
     - [ ] Starting With Bytes
