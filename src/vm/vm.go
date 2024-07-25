@@ -34,6 +34,11 @@ func New(bytecode *compiler.Bytecode) *VM {
 // 	return vm.stack[vm.sp-1]
 // }
 
+// boolean objects
+
+var True = &object.Boolean{Value: true}
+var False = &object.Boolean{Value: false}
+
 // Runs the VM
 func (vm *VM) Run() error {
 	for ip := 0; ip < len(vm.instructions); ip++ {
@@ -55,6 +60,18 @@ func (vm *VM) Run() error {
 
 		case code.OpPop:
 			vm.pop()
+
+		case code.OpTrue:
+			err := vm.push(True)
+			if err != nil {
+				return err
+			}
+
+		case code.OpFalse:
+			err := vm.push(False)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

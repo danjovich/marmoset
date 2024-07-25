@@ -13,11 +13,16 @@ type Opcode byte
 const (
 	// pushes constant to stack
 	OpConstant Opcode = iota
+	// infix operations
 	OpAdd
 	OpSub
 	OpMul
 	OpDiv
+	// pops top of the stack
 	OpPop
+	// pushes booleans
+	OpTrue
+	OpFalse
 )
 
 // opcode definitions (for debugging/testing purposes)
@@ -35,6 +40,8 @@ var definitions = map[Opcode]*Definition{
 	OpMul:      {"OpMul", []int{}},
 	OpDiv:      {"OpDiv", []int{}},
 	OpPop:      {"OpPop", []int{}},
+	OpTrue:     {"OpTrue", []int{}},
+	OpFalse:    {"OpFalse", []int{}},
 }
 
 func Lookup(op byte) (*Definition, error) {

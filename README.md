@@ -29,7 +29,7 @@ This is the interpreter from the book [Writing A Compiler In Go](https://compile
 - [ ] 3. Compiling Expressions
   - [x] Cleaning Up the Stack
   - [x] Infix Expressions
-  - [ ] Booleans
+  - [x] Booleans
   - [ ] Comparison Operators
   - [ ] Prefix Expressions
 - [ ] 4. Conditionals
