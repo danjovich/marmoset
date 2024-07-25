@@ -89,8 +89,9 @@ func bytecodeInterpreter(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		stackTop := machine.StackTop()
-		io.WriteString(out, stackTop.Inspect())
+		// last popped stack element should be the result of the last expression (not the stack top)
+		lastPopped := machine.LastPoppedStackElem()
+		io.WriteString(out, lastPopped.Inspect())
 		io.WriteString(out, "\n")
 	}
 }

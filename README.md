@@ -27,8 +27,8 @@ This is the interpreter from the book [Writing A Compiler In Go](https://compile
   - [x] Adding on the Stack
   - [x] Hooking up the REPL
 - [ ] 3. Compiling Expressions
-  - [ ] Cleaning Up the Stack
-  - [ ] Infix Expressions
+  - [x] Cleaning Up the Stack
+  - [x] Infix Expressions
   - [ ] Booleans
   - [ ] Comparison Operators
   - [ ] Prefix Expressions
