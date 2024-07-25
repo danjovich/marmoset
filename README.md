@@ -32,11 +32,11 @@ This is the interpreter from the book [Writing A Compiler In Go](https://compile
   - [x] Booleans
   - [x] Comparison Operators
   - [x] Prefix Expressions
-- [ ] 4. Conditionals
-  - [ ] Jumps
-  - [ ] Compiling Conditionals
-  - [ ] Executing Jumps
-  - [ ] Welcome Back, Null!
+- [x] 4. Conditionals
+  - [x] Jumps
+  - [x] Compiling Conditionals
+  - [x] Executing Jumps
+  - [x] Welcome Back, Null!
 - [ ] 5. Keeping Track of Names
   - [ ] The Plan
   - [ ] Compiling Bindings
