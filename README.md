@@ -26,12 +26,12 @@ This is the interpreter from the book [Writing A Compiler In Go](https://compile
     - [x] Powering On the Machine
   - [x] Adding on the Stack
   - [x] Hooking up the REPL
-- [ ] 3. Compiling Expressions
+- [x] 3. Compiling Expressions
   - [x] Cleaning Up the Stack
   - [x] Infix Expressions
   - [x] Booleans
   - [x] Comparison Operators
-  - [ ] Prefix Expressions
+  - [x] Prefix Expressions
 - [ ] 4. Conditionals
   - [ ] Jumps
   - [ ] Compiling Conditionals

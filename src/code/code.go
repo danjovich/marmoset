@@ -27,6 +27,9 @@ const (
 	OpEqual
 	OpNotEqual
 	OpGreaterThan
+	// prefix operators
+	OpMinus
+	OpBang
 )
 
 // opcode definitions (for debugging/testing purposes)
@@ -49,6 +52,8 @@ var definitions = map[Opcode]*Definition{
 	OpEqual:       {"OpEqual", []int{}},
 	OpNotEqual:    {"OpNotEqual", []int{}},
 	OpGreaterThan: {"OpGreaterThan", []int{}},
+	OpMinus:       {"OpMinus", []int{}},
+	OpBang:        {"OpBang", []int{}},
 }
 
 func Lookup(op byte) (*Definition, error) {
