@@ -13,7 +13,7 @@ type Opcode byte
 const (
 	// pushes constant to stack
 	OpConstant Opcode = iota
-	// infix operations
+	// arithmetic operations
 	OpAdd
 	OpSub
 	OpMul
@@ -23,6 +23,10 @@ const (
 	// pushes booleans
 	OpTrue
 	OpFalse
+	// comparison operators
+	OpEqual
+	OpNotEqual
+	OpGreaterThan
 )
 
 // opcode definitions (for debugging/testing purposes)
@@ -34,14 +38,17 @@ type Definition struct {
 }
 
 var definitions = map[Opcode]*Definition{
-	OpConstant: {"OpConstant", []int{2}},
-	OpAdd:      {"OpAdd", []int{}},
-	OpSub:      {"OpSub", []int{}},
-	OpMul:      {"OpMul", []int{}},
-	OpDiv:      {"OpDiv", []int{}},
-	OpPop:      {"OpPop", []int{}},
-	OpTrue:     {"OpTrue", []int{}},
-	OpFalse:    {"OpFalse", []int{}},
+	OpConstant:    {"OpConstant", []int{2}},
+	OpAdd:         {"OpAdd", []int{}},
+	OpSub:         {"OpSub", []int{}},
+	OpMul:         {"OpMul", []int{}},
+	OpDiv:         {"OpDiv", []int{}},
+	OpPop:         {"OpPop", []int{}},
+	OpTrue:        {"OpTrue", []int{}},
+	OpFalse:       {"OpFalse", []int{}},
+	OpEqual:       {"OpEqual", []int{}},
+	OpNotEqual:    {"OpNotEqual", []int{}},
+	OpGreaterThan: {"OpGreaterThan", []int{}},
 }
 
 func Lookup(op byte) (*Definition, error) {

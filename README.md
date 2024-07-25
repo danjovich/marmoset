@@ -17,7 +17,7 @@ This is the interpreter from the book [Writing A Compiler In Go](https://compile
     - [x] Why Build One?
     - [x] Bytecode
   - [x] What We’re Going to Do, or: the Duality of VM and Compiler
-- [ ] 2. Hello Bytecode!
+- [x] 2. Hello Bytecode!
   - [x] First Instructions
     - [x] Starting With Bytes
     - [x] The Smallest Compiler
@@ -30,7 +30,7 @@ This is the interpreter from the book [Writing A Compiler In Go](https://compile
   - [x] Cleaning Up the Stack
   - [x] Infix Expressions
   - [x] Booleans
-  - [ ] Comparison Operators
+  - [x] Comparison Operators
   - [ ] Prefix Expressions
 - [ ] 4. Conditionals
   - [ ] Jumps
