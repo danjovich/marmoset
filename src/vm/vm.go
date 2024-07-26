@@ -10,11 +10,15 @@ import (
 // Maximum stack size
 const StackSize = 2048
 
+// Maximum globals store size
+const GlobalsSize = 65536
+
 type VM struct {
 	constants    []object.Object
 	instructions code.Instructions
 	stack        []object.Object
 	sp           int // Always points to the next value. Top of stack is stack[sp-1]
+	globals      []object.Object
 }
 
 func New(bytecode *compiler.Bytecode) *VM {
@@ -23,16 +27,16 @@ func New(bytecode *compiler.Bytecode) *VM {
 		constants:    bytecode.Constants,
 		stack:        make([]object.Object, StackSize),
 		sp:           0,
+		globals:      make([]object.Object, GlobalsSize), // all used memory for globals is already allocated
 	}
 }
 
-// // Retrieves the stack top
-// func (vm *VM) StackTop() object.Object {
-// 	if vm.sp == 0 {
-// 		return nil
-// 	}
-// 	return vm.stack[vm.sp-1]
-// }
+// For preserving state between REPL runs
+func NewWithGlobalsStore(bytecode *compiler.Bytecode, s []object.Object) *VM {
+	vm := New(bytecode)
+	vm.globals = s
+	return vm
+}
 
 // boolean objects
 var True = &object.Boolean{Value: true}
@@ -108,6 +112,19 @@ func (vm *VM) Run() error {
 
 		case code.OpNull:
 			err := vm.push(Null)
+			if err != nil {
+				return err
+			}
+
+		case code.OpSetGlobal:
+			globalIndex := code.ReadUint16(vm.instructions[ip+1:])
+			ip += 2
+			vm.globals[globalIndex] = vm.pop()
+
+		case code.OpGetGlobal:
+			globalIndex := code.ReadUint16(vm.instructions[ip+1:])
+			ip += 2
+			err := vm.push(vm.globals[globalIndex])
 			if err != nil {
 				return err
 			}

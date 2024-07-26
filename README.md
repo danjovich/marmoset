@@ -37,12 +37,12 @@ This is the interpreter from the book [Writing A Compiler In Go](https://compile
   - [x] Compiling Conditionals
   - [x] Executing Jumps
   - [x] Welcome Back, Null!
-- [ ] 5. Keeping Track of Names
-  - [ ] The Plan
-  - [ ] Compiling Bindings
-    - [ ] Introducing: the Symbol Table
-    - [ ] Using Symbols in the Compiler
-  - [ ] Adding Globals to the VM
+- [x] 5. Keeping Track of Names
+  - [x] The Plan
+  - [x] Compiling Bindings
+    - [x] Introducing: the Symbol Table
+    - [x] Using Symbols in the Compiler
+  - [x] Adding Globals to the VM
 - [ ] 6. String, Array and Hash
   - [ ] String
   - [ ] Array
