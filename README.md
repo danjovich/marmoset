@@ -46,7 +46,7 @@ This is the interpreter from the book [Writing A Compiler In Go](https://compile
 - [ ] 6. String, Array and Hash
   - [x] String
   - [x] Array
-  - [ ] Hash
+  - [x] Hash
   - [ ] Adding the index operator
 - [ ] 7. Functions
   - [ ] Dipping Our Toes: a Simple Function

@@ -38,8 +38,10 @@ const (
 	// manipulation of the globals store (identifiers)
 	OpGetGlobal
 	OpSetGlobal
-	// pushes array length and generates array from last values on the stack
+	// pushes array last values on the stack (passes length as an argument)
 	OpArray
+	// pushes hash from keys and values on the stack (passes length as an argument)
+	OpHash
 )
 
 // opcode definitions (for debugging/testing purposes)
@@ -70,6 +72,7 @@ var definitions = map[Opcode]*Definition{
 	OpGetGlobal:     {"OpGetGlobal", []int{2}},
 	OpSetGlobal:     {"OpSetGlobal", []int{2}},
 	OpArray:         {"OpArray", []int{2}},
+	OpHash:          {"OpHash", []int{2}},
 }
 
 func Lookup(op byte) (*Definition, error) {
