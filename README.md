@@ -44,7 +44,7 @@ This is the interpreter from the book [Writing A Compiler In Go](https://compile
     - [x] Using Symbols in the Compiler
   - [x] Adding Globals to the VM
 - [ ] 6. String, Array and Hash
-  - [ ] String
+  - [x] String
   - [ ] Array
   - [ ] Hash
   - [ ] Adding the index operator
