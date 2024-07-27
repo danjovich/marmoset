@@ -45,7 +45,7 @@ This is the interpreter from the book [Writing A Compiler In Go](https://compile
   - [x] Adding Globals to the VM
 - [ ] 6. String, Array and Hash
   - [x] String
-  - [ ] Array
+  - [x] Array
   - [ ] Hash
   - [ ] Adding the index operator
 - [ ] 7. Functions
