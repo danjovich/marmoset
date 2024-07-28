@@ -42,6 +42,8 @@ const (
 	OpArray
 	// pushes hash from keys and values on the stack (passes length as an argument)
 	OpHash
+	// index operator that applies the last stack value as index to the second-last stack value (object)
+	OpIndex
 )
 
 // opcode definitions (for debugging/testing purposes)
@@ -73,6 +75,7 @@ var definitions = map[Opcode]*Definition{
 	OpSetGlobal:     {"OpSetGlobal", []int{2}},
 	OpArray:         {"OpArray", []int{2}},
 	OpHash:          {"OpHash", []int{2}},
+	OpIndex:         {"OpIndex", []int{}},
 }
 
 func Lookup(op byte) (*Definition, error) {
