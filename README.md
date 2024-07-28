@@ -43,16 +43,16 @@ This is the interpreter from the book [Writing A Compiler In Go](https://compile
     - [x] Introducing: the Symbol Table
     - [x] Using Symbols in the Compiler
   - [x] Adding Globals to the VM
-- [ ] 6. String, Array and Hash
+- [x] 6. String, Array and Hash
   - [x] String
   - [x] Array
   - [x] Hash
   - [x] Adding the index operator
 - [ ] 7. Functions
   - [ ] Dipping Our Toes: a Simple Function
-    - [ ] Representing Functions
-    - [ ] Opcodes to Execute Functions
-    - [ ] Compiling Function Literals
+    - [x] Representing Functions
+    - [x] Opcodes to Execute Functions
+    - [x] Compiling Function Literals
     - [ ] Compiling Function Calls
     - [ ] Functions in the VM
     - [ ] A Little Bonus

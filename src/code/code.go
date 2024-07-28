@@ -44,6 +44,12 @@ const (
 	OpHash
 	// index operator that applies the last stack value as index to the second-last stack value (object)
 	OpIndex
+	// calls function with (constant pool) index at the top of the stack
+	OpCall
+	// returns from a function with a return value (last value in the stack)
+	OpReturnValue
+	// returns null from a function
+	OpReturn
 )
 
 // opcode definitions (for debugging/testing purposes)
@@ -76,6 +82,8 @@ var definitions = map[Opcode]*Definition{
 	OpArray:         {"OpArray", []int{2}},
 	OpHash:          {"OpHash", []int{2}},
 	OpIndex:         {"OpIndex", []int{}},
+	OpReturnValue:   {"OpReturnValue", []int{}},
+	OpReturn:        {"OpReturn", []int{}},
 }
 
 func Lookup(op byte) (*Definition, error) {
