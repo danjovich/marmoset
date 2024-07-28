@@ -49,13 +49,13 @@ This is the interpreter from the book [Writing A Compiler In Go](https://compile
   - [x] Hash
   - [x] Adding the index operator
 - [ ] 7. Functions
-  - [ ] Dipping Our Toes: a Simple Function
+  - [x] Dipping Our Toes: a Simple Function
     - [x] Representing Functions
     - [x] Opcodes to Execute Functions
     - [x] Compiling Function Literals
     - [x] Compiling Function Calls
-    - [ ] Functions in the VM
-    - [ ] A Little Bonus
+    - [x] Functions in the VM
+    - [x] A Little Bonus
   - [ ] Local Bindings
     - [ ] Opcodes for Local Bindings
     - [ ] Compiling Locals
