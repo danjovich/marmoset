@@ -53,7 +53,7 @@ This is the interpreter from the book [Writing A Compiler In Go](https://compile
     - [x] Representing Functions
     - [x] Opcodes to Execute Functions
     - [x] Compiling Function Literals
-    - [ ] Compiling Function Calls
+    - [x] Compiling Function Calls
     - [ ] Functions in the VM
     - [ ] A Little Bonus
   - [ ] Local Bindings
