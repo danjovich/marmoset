@@ -203,6 +203,7 @@ func (h *Hash) Inspect() string {
 // compiled function objects (that hold bytecode)
 type CompiledFunction struct {
 	Instructions code.Instructions
+	NumLocals    int // amount of local variables in a function
 }
 
 func (cf *CompiledFunction) Type() ObjectType { return COMPILED_FUNCTION_OBJ }
