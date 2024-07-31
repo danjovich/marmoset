@@ -44,6 +44,11 @@ func (s *SymbolTable) Define(name string) Symbol {
 	return symbol
 }
 
+func (s *SymbolTable) Remove(symbol Symbol) {
+	delete(s.store, symbol.Name)
+	s.numDefinitions--
+}
+
 func (s *SymbolTable) Resolve(name string) (Symbol, bool) {
 	obj, ok := s.store[name]
 	if !ok && s.Outer != nil {
