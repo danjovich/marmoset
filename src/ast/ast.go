@@ -37,7 +37,6 @@ type LetStatement struct {
 }
 
 func (ls *LetStatement) statementNode() {
-	return
 }
 
 func (ls *LetStatement) TokenLiteral() string {
@@ -217,28 +216,31 @@ func (bs *BlockStatement) String() string {
 	return out.String()
 }
 
-// function literals
-type FunctionLiteral struct {
+// function (declaration) statements
+type FunctionStatement struct {
 	Token      token.Token // The 'fn' token
+	Name       *Identifier
 	Parameters []*Identifier
 	Body       *BlockStatement
 }
 
-func (fl *FunctionLiteral) expressionNode()      {}
-func (fl *FunctionLiteral) TokenLiteral() string { return fl.Token.Literal }
-func (fl *FunctionLiteral) String() string {
+func (fe *FunctionStatement) statementNode()       {}
+func (fe *FunctionStatement) TokenLiteral() string { return fe.Token.Literal }
+func (fe *FunctionStatement) String() string {
 	var out bytes.Buffer
 
 	params := []string{}
-	for _, p := range fl.Parameters {
+	for _, p := range fe.Parameters {
 		params = append(params, p.String())
 	}
 
-	out.WriteString(fl.TokenLiteral())
+	out.WriteString(fe.TokenLiteral())
+	out.WriteString(" ")
+	out.WriteString(fe.Name.Value)
 	out.WriteString("(")
 	out.WriteString(strings.Join(params, ", "))
 	out.WriteString(") ")
-	out.WriteString(fl.Body.String())
+	out.WriteString(fe.Body.String())
 
 	return out.String()
 }
@@ -246,7 +248,7 @@ func (fl *FunctionLiteral) String() string {
 // call expressions
 type CallExpression struct {
 	Token     token.Token // The '(' token
-	Function  Expression  // Identifier or FunctionLiteral
+	Function  Expression  // Identifier or FunctionStatement
 	Arguments []Expression
 }
 

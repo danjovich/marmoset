@@ -11,9 +11,9 @@ Já que a linguagem implementada no livro se chama "monkey", o nome da linguagem
   - [ ] Strings são apenas arrays de inteiros tratados como `char`'s;
     - [ ] Sem suporte para Unicode.
   - [ ] Estilo C: "tudo" é um `int`.
-- [ ] Mudar declaração de funções para o nome vir depois de `fn`;
-  - [ ] Mudar compilação de `let` para evitar que referência a si mesmo cause "null pointer dereference";
-  - [ ] Para facilitar compilação para ARM, fazer funções não serem mais "cidadãs de primeira classe" (impedir uso como argumento de outras funções).
+- [x] Mudar declaração de funções para o nome vir depois de `fn`;
+  - [x] Mudar compilação de `let` para evitar que referência a si mesmo cause "null pointer dereference";
+  - [x] Para facilitar compilação para ARM, fazer funções não serem mais "cidadãs de primeira classe" (impedir uso como argumento de outras funções).
 - [ ] Talvez remover retornos implícitos;
 - [ ] Remover implementação de hashes;
 - [ ] Criar built-in `gets`;

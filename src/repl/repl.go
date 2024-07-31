@@ -60,8 +60,10 @@ func Start(in io.Reader, out io.Writer, args *Args) {
 
 		// last popped stack element should be the result of the last expression (not the stack top)
 		lastPopped := machine.LastPoppedStackElem()
-		io.WriteString(out, lastPopped.Inspect())
-		io.WriteString(out, "\n")
+		if lastPopped != nil {
+			io.WriteString(out, lastPopped.Inspect())
+			io.WriteString(out, "\n")
+		}
 	}
 }
 

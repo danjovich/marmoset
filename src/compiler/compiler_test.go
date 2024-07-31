@@ -575,7 +575,7 @@ func TestIndexExpressions(t *testing.T) {
 func TestFunctions(t *testing.T) {
 	tests := []compilerTestCase{
 		{
-			input: `fn() { return 5 + 10 }`,
+			input: `fn func(){ return 5 + 10 }`,
 			expectedConstants: []interface{}{
 				5,
 				10,
@@ -588,12 +588,12 @@ func TestFunctions(t *testing.T) {
 			},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.OpConstant, 2),
-				code.Make(code.OpPop),
+				code.Make(code.OpSetGlobal, 0),
 			},
 		},
 		// implicit return statements should work the same as explicit ones
 		{
-			input: `fn() { 5 + 10 }`,
+			input: `fn func(){ 5 + 10 }`,
 			expectedConstants: []interface{}{
 				5,
 				10,
@@ -606,11 +606,11 @@ func TestFunctions(t *testing.T) {
 			},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.OpConstant, 2),
-				code.Make(code.OpPop),
+				code.Make(code.OpSetGlobal, 0),
 			},
 		},
 		{
-			input: `fn() { 1; 2 }`,
+			input: `fn func(){ 1; 2 }`,
 			expectedConstants: []interface{}{
 				1,
 				2,
@@ -623,11 +623,11 @@ func TestFunctions(t *testing.T) {
 			},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.OpConstant, 2),
-				code.Make(code.OpPop),
+				code.Make(code.OpSetGlobal, 0),
 			},
 		},
 		{
-			input: `fn() { }`,
+			input: `fn func(){ }`,
 			expectedConstants: []interface{}{
 				[]code.Instructions{
 					code.Make(code.OpReturn),
@@ -635,7 +635,7 @@ func TestFunctions(t *testing.T) {
 			},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.OpConstant, 0),
-				code.Make(code.OpPop),
+				code.Make(code.OpSetGlobal, 0),
 			},
 		},
 	}
@@ -717,25 +717,10 @@ func TestCompilerScopes(t *testing.T) {
 func TestFunctionCalls(t *testing.T) {
 	tests := []compilerTestCase{
 		{
-			input: `fn() { 24 }();`,
-			expectedConstants: []interface{}{
-				24,
-				[]code.Instructions{
-					code.Make(code.OpConstant, 0), // The literal "24"
-					code.Make(code.OpReturnValue),
-				},
-			},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.OpConstant, 1), // The compiled function
-				code.Make(code.OpCall, 0),
-				code.Make(code.OpPop),
-			},
-		},
-		{
 			input: `
-let noArg = fn() { 24 };
-noArg();
-`,
+		fn noArg() { 24 };
+		noArg();
+		`,
 			expectedConstants: []interface{}{
 				24,
 				[]code.Instructions{
@@ -753,7 +738,7 @@ noArg();
 		},
 		{
 			input: `
-let fivePlusTen = fn() { 5 + 10; };
+fn fivePlusTen() { 5 + 10; };
 fivePlusTen();
 `,
 			expectedConstants: []interface{}{
@@ -776,7 +761,7 @@ fivePlusTen();
 		},
 		{
 			input: `
-let oneArg = fn(a) { a };
+fn oneArg(a) { a };
 oneArg(24);
 `,
 			expectedConstants: []interface{}{
@@ -797,7 +782,7 @@ oneArg(24);
 		},
 		{
 			input: `
-let manyArg = fn(a, b, c) { a; b; c };
+fn manyArg(a, b, c) { a; b; c };
 manyArg(24, 25, 26);
 `,
 			expectedConstants: []interface{}{
@@ -835,7 +820,7 @@ func TestLetStatementScopes(t *testing.T) {
 		{
 			input: `
 let num = 55;
-fn() { num }
+fn func(){ num }
 `,
 			expectedConstants: []interface{}{
 				55,
@@ -848,12 +833,12 @@ fn() { num }
 				code.Make(code.OpConstant, 0),
 				code.Make(code.OpSetGlobal, 0),
 				code.Make(code.OpConstant, 1),
-				code.Make(code.OpPop),
+				code.Make(code.OpSetGlobal, 1),
 			},
 		},
 		{
 			input: `
-fn() {
+fn func(){
 let num = 55;
 num
 }
@@ -869,12 +854,12 @@ num
 			},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.OpConstant, 1),
-				code.Make(code.OpPop),
+				code.Make(code.OpSetGlobal, 0),
 			},
 		},
 		{
 			input: `
-fn() {
+fn func(){
 let a = 55;
 let b = 77;
 a + b
@@ -896,7 +881,7 @@ a + b
 			},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.OpConstant, 2),
-				code.Make(code.OpPop),
+				code.Make(code.OpSetGlobal, 0),
 			},
 		},
 	}
@@ -925,7 +910,7 @@ push([], 1);
 			},
 		},
 		{
-			input: `fn() { len([]) }`,
+			input: `fn func(){ len([]) }`,
 			expectedConstants: []interface{}{
 				[]code.Instructions{
 					code.Make(code.OpGetBuiltin, 0),
@@ -936,7 +921,7 @@ push([], 1);
 			},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.OpConstant, 0),
-				code.Make(code.OpPop),
+				code.Make(code.OpSetGlobal, 0),
 			},
 		},
 	}

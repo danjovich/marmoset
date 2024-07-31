@@ -41,7 +41,6 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.FALSE, p.parseBoolean)
 	p.registerPrefix(token.LPAREN, p.parseGroupedExpression)
 	p.registerPrefix(token.IF, p.parseIfExpression)
-	p.registerPrefix(token.FUNCTION, p.parseFunctionLiteral)
 	p.registerPrefix(token.STRING, p.parseStringLiteral)
 	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)
 	p.registerPrefix(token.LBRACE, p.parseHashLiteral)
@@ -90,6 +89,10 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseLetStatement()
 	case token.RETURN:
 		return p.parseReturnStatement()
+	case token.FUNCTION:
+		return p.parseFunctionStatement()
+	case token.SEMICOLON:
+		return &ast.ExpressionStatement{Token: p.curToken, Expression: nil}
 	default:
 		return p.parseExpressionStatement()
 	}
@@ -128,6 +131,7 @@ func (p *Parser) peekTokenIs(t token.TokenType) bool {
 	return p.peekToken.Type == t
 }
 
+// checks if next token is the expected and advance the parer if it is, generates error otherwise
 func (p *Parser) expectPeek(t token.TokenType) bool {
 	if p.peekTokenIs(t) {
 		p.nextToken()
@@ -159,6 +163,31 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
+
+	return stmt
+}
+
+// function statements
+func (p *Parser) parseFunctionStatement() ast.Statement {
+	stmt := &ast.FunctionStatement{Token: p.curToken}
+
+	if !p.expectPeek(token.IDENT) {
+		return nil
+	}
+
+	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+
+	stmt.Parameters = p.parseFunctionParameters()
+
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+
+	stmt.Body = p.parseBlockStatement()
 
 	return stmt
 }
@@ -403,25 +432,6 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 	}
 
 	return block
-}
-
-// function literals
-func (p *Parser) parseFunctionLiteral() ast.Expression {
-	lit := &ast.FunctionLiteral{Token: p.curToken}
-
-	if !p.expectPeek(token.LPAREN) {
-		return nil
-	}
-
-	lit.Parameters = p.parseFunctionParameters()
-
-	if !p.expectPeek(token.LBRACE) {
-		return nil
-	}
-
-	lit.Body = p.parseBlockStatement()
-
-	return lit
 }
 
 // function parameters

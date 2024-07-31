@@ -67,6 +67,10 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 
 	case *ast.ExpressionStatement:
+		// hanging ; should do nothing
+		if node.Expression == nil {
+			return nil
+		}
 		err := c.Compile(node.Expression)
 		if err != nil {
 			return err
@@ -188,13 +192,11 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 
 	case *ast.LetStatement:
-		// defines symbol before compiling it to allow recursive function to know their own existence
-		symbol := c.symbolTable.Define(node.Name.Value)
 		err := c.Compile(node.Value)
 		if err != nil {
-			c.symbolTable.Remove(symbol)
 			return err
 		}
+		symbol := c.symbolTable.Define(node.Name.Value)
 		if symbol.Scope == GlobalScope {
 			c.emit(code.OpSetGlobal, symbol.Index)
 		} else {
@@ -255,7 +257,10 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 		c.emit(code.OpIndex)
 
-	case *ast.FunctionLiteral:
+	case *ast.FunctionStatement:
+		// defines symbol before compiling function to allow recursive function to know their own existence
+		symbol := c.symbolTable.Define(node.Name.Value)
+		// enters new function scope
 		c.enterScope()
 		// defines function arguments in the current scope symbol table
 		for _, p := range node.Parameters {
@@ -285,6 +290,12 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 		// emits an instruction to push the CompiledFunction as a constant
 		c.emit(code.OpConstant, c.addConstant(compiledFn))
+		// emits definition of identifier
+		if symbol.Scope == GlobalScope {
+			c.emit(code.OpSetGlobal, symbol.Index)
+		} else {
+			c.emit(code.OpSetLocal, symbol.Index)
+		}
 
 	case *ast.ReturnStatement:
 		err := c.Compile(node.ReturnValue)

@@ -9,7 +9,7 @@ func TestNextToken(t *testing.T) {
 	input := `let five = 5;
 let ten = 10;
 
-let add = fn(x, y) {
+fn add(x, y) {
 	x + y;
 };
 
@@ -47,10 +47,8 @@ if (5 < 10) {
 		{token.ASSIGN, "="},
 		{token.INT, "10"},
 		{token.SEMICOLON, ";"},
-		{token.LET, "let"},
-		{token.IDENT, "add"},
-		{token.ASSIGN, "="},
 		{token.FUNCTION, "fn"},
+		{token.IDENT, "add"},
 		{token.LPAREN, "("},
 		{token.IDENT, "x"},
 		{token.COMMA, ","},
