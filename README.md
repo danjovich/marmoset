@@ -64,11 +64,11 @@ This is the interpreter from the book [Writing A Compiler In Go](https://compile
     - [x] Compiling Calls With Arguments
     - [x] Resolving References to Arguments
     - [x] Arguments in the VM
-- [ ] 8. Built-in Functions
-  - [ ] Making the Change Easy
-  - [ ] Making the Change: the Plan
-  - [ ] A New Scope for Built-in Functions
-  - [ ] Executing built-in functions
+- [x] 8. Built-in Functions
+  - [x] Making the Change Easy
+  - [x] Making the Change: the Plan
+  - [x] A New Scope for Built-in Functions
+  - [x] Executing built-in functions
 - [ ] 9. Closures
   - [ ] The Problem
   - [ ] The Plan

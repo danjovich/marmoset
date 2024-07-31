@@ -53,6 +53,8 @@ const (
 	// local bindings
 	OpGetLocal
 	OpSetLocal
+	// get a builtin function
+	OpGetBuiltin
 )
 
 // opcode definitions (for debugging/testing purposes)
@@ -88,8 +90,9 @@ var definitions = map[Opcode]*Definition{
 	OpCall:          {"OpCall", []int{1}},
 	OpReturnValue:   {"OpReturnValue", []int{}},
 	OpReturn:        {"OpReturn", []int{}},
-	OpGetLocal:      {"OpGetLocal", []int{1}}, // 256 possible bindings
-	OpSetLocal:      {"OpSetLocal", []int{1}}, // 256 possible bindings
+	OpGetLocal:      {"OpGetLocal", []int{1}},   // 256 possible bindings
+	OpSetLocal:      {"OpSetLocal", []int{1}},   // 256 possible bindings
+	OpGetBuiltin:    {"OpGetBuiltin", []int{1}}, // 256 possible builtins
 }
 
 func Lookup(op byte) (*Definition, error) {
