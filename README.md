@@ -60,10 +60,10 @@ This is the interpreter from the book [Writing A Compiler In Go](https://compile
     - [x] Opcodes for Local Bindings
     - [x] Compiling Locals
     - [x] Implementing Local Bindings in the VM
-  - [ ] Arguments
-    - [ ] Compiling Calls With Arguments
-    - [ ] Resolving References to Arguments
-    - [ ] Arguments in the VM
+  - [x] Arguments
+    - [x] Compiling Calls With Arguments
+    - [x] Resolving References to Arguments
+    - [x] Arguments in the VM
 - [ ] 8. Built-in Functions
   - [ ] Making the Change Easy
   - [ ] Making the Change: the Plan

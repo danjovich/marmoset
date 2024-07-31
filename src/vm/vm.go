@@ -184,14 +184,14 @@ func (vm *VM) Run() error {
 			}
 
 		case code.OpCall:
-			fn, ok := vm.stack[vm.sp-1].(*object.CompiledFunction)
-			if !ok {
-				return fmt.Errorf("calling non-function")
+			// reads OpCall argument (number of args in the calling function)
+			numArgs := code.ReadUint8(ins[*ip+1:])
+			vm.currentFrame().ip += 1
+
+			err := vm.callFunction(int(numArgs))
+			if err != nil {
+				return err
 			}
-			frame := NewFrame(fn, vm.sp)
-			vm.pushFrame(frame)
-			// "allocates" space on the stack for the new frame
-			vm.sp = frame.basePointer + fn.NumLocals
 
 		case code.OpReturnValue:
 			returnValue := vm.pop()
@@ -487,4 +487,27 @@ func (vm *VM) executeHashIndex(hash, index object.Object) error {
 	}
 
 	return vm.push(pair.Value)
+}
+
+func (vm *VM) callFunction(numArgs int) error {
+	// gets the function from the stack
+	fn, ok := vm.stack[vm.sp-1-numArgs].(*object.CompiledFunction)
+	if !ok {
+		return fmt.Errorf("calling non-function")
+	}
+
+	// makes sure the call has the function declared number of args
+	if numArgs != fn.NumParameters {
+		return fmt.Errorf("wrong number of arguments: want=%d, got=%d",
+			fn.NumParameters, numArgs)
+	}
+
+	// frame has to include local args (hence vm.sp-numArgs)
+	frame := NewFrame(fn, vm.sp-numArgs)
+	vm.pushFrame(frame)
+
+	// "allocates" space on the stack for the new frame
+	vm.sp = frame.basePointer + fn.NumLocals
+
+	return nil
 }
