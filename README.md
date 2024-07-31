@@ -17,4 +17,5 @@ Já que a linguagem implementada no livro se chama "monkey", o nome da linguagem
 - [ ] Talvez remover retornos implícitos;
 - [ ] Remover implementação de hashes;
 - [ ] Criar built-in `gets`;
+- [ ] Compilar arquivos (sem REPL, manter só o REPL de bytecode);
 - [ ] Se sobrar tempo, implementar `while`.
