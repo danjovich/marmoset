@@ -1,79 +1,20 @@
-# 🐒 Monkey compiler
+# Marmoset: Uma linguagem de programação compilada para ARM
 
-This is the interpreter from the book [Writing A Compiler In Go](https://compilerbook.com/), by Thorsten Ball.
+Essa é uma linguagem de programação simples inspirada na implementada no livro [_Writing A Compiler In Go_](https://compilerbook.com/), escrito por Thorsten Ball.
 
-## Progress
+Já que a linguagem implementada no livro se chama "monkey", o nome da linguagem vem do fato de que _marmoset_ (sagui) é uma espécie de macaco e a linguagem é compilada para ARM (mARMoset).
 
-- [x] Introduction
-  - [x] Evolving Monkey
-    - [x] The Past and Present
-    - [x] The Future
-  - [x] Use This Book
-- [x] 1. Compilers & Virtual Machines
-  - [x] Compilers
-  - [x] Virtual and Real Machines
-    - [x] Real Machines
-    - [x] What Is a Virtual Machine?
-    - [x] Why Build One?
-    - [x] Bytecode
-  - [x] What We’re Going to Do, or: the Duality of VM and Compiler
-- [x] 2. Hello Bytecode!
-  - [x] First Instructions
-    - [x] Starting With Bytes
-    - [x] The Smallest Compiler
-    - [x] Bytecode, Disassemble!
-    - [x] Back to the Task at Hand
-    - [x] Powering On the Machine
-  - [x] Adding on the Stack
-  - [x] Hooking up the REPL
-- [x] 3. Compiling Expressions
-  - [x] Cleaning Up the Stack
-  - [x] Infix Expressions
-  - [x] Booleans
-  - [x] Comparison Operators
-  - [x] Prefix Expressions
-- [x] 4. Conditionals
-  - [x] Jumps
-  - [x] Compiling Conditionals
-  - [x] Executing Jumps
-  - [x] Welcome Back, Null!
-- [x] 5. Keeping Track of Names
-  - [x] The Plan
-  - [x] Compiling Bindings
-    - [x] Introducing: the Symbol Table
-    - [x] Using Symbols in the Compiler
-  - [x] Adding Globals to the VM
-- [x] 6. String, Array and Hash
-  - [x] String
-  - [x] Array
-  - [x] Hash
-  - [x] Adding the index operator
-- [ ] 7. Functions
-  - [x] Dipping Our Toes: a Simple Function
-    - [x] Representing Functions
-    - [x] Opcodes to Execute Functions
-    - [x] Compiling Function Literals
-    - [x] Compiling Function Calls
-    - [x] Functions in the VM
-    - [x] A Little Bonus
-  - [x] Local Bindings
-    - [x] Opcodes for Local Bindings
-    - [x] Compiling Locals
-    - [x] Implementing Local Bindings in the VM
-  - [x] Arguments
-    - [x] Compiling Calls With Arguments
-    - [x] Resolving References to Arguments
-    - [x] Arguments in the VM
-- [x] 8. Built-in Functions
-  - [x] Making the Change Easy
-  - [x] Making the Change: the Plan
-  - [x] A New Scope for Built-in Functions
-  - [x] Executing built-in functions
-- [ ] 9. Closures
-  - [ ] The Problem
-  - [ ] The Plan
-  - [ ] Everything’s a closure
-  - [ ] Compiling and resolving free variables
-  - [ ] Creating real closures at run time
-  - [ ] Recursive Closures
-- [ ] 10. Taking Time
+## Progresso de desenvolvimento
+
+- [x] Implementar funções recursivas;
+- [ ] Tipagem estática;
+  - [ ] Strings são apenas arrays de inteiros tratados como `char`'s;
+    - [ ] Sem suporte para Unicode.
+  - [ ] Estilo C: "tudo" é um `int`.
+- [ ] Mudar declaração de funções para o nome vir depois de `fn`;
+  - [ ] Mudar compilação de `let` para evitar que referência a si mesmo cause "null pointer dereference";
+  - [ ] Para facilitar compilação para ARM, fazer funções não serem mais "cidadãs de primeira classe" (impedir uso como argumento de outras funções).
+- [ ] Talvez remover retornos implícitos;
+- [ ] Remover implementação de hashes;
+- [ ] Criar built-in `gets`;
+- [ ] Se sobrar tempo, implementar `while`.
