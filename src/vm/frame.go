@@ -1,8 +1,8 @@
 package vm
 
 import (
-	"monkey/code"
-	"monkey/object"
+	"marmoset/code"
+	"marmoset/object"
 )
 
 type Frame struct {

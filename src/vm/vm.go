@@ -2,9 +2,9 @@ package vm
 
 import (
 	"fmt"
-	"monkey/code"
-	"monkey/compiler"
-	"monkey/object"
+	"marmoset/code"
+	"marmoset/compiler"
+	"marmoset/object"
 )
 
 // Maximum stack size
@@ -412,7 +412,7 @@ func (vm *VM) executeMinusOperator() error {
 	return vm.push(&object.Integer{Value: -value})
 }
 
-// Tests whether a value is Monkey - truthy
+// Tests whether a value is truthy
 func isTruthy(obj object.Object) bool {
 	switch obj := obj.(type) {
 	case *object.Boolean:

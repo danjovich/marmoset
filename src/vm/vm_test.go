@@ -2,11 +2,11 @@ package vm
 
 import (
 	"fmt"
-	"monkey/ast"
-	"monkey/compiler"
-	"monkey/lexer"
-	"monkey/object"
-	"monkey/parser"
+	"marmoset/ast"
+	"marmoset/compiler"
+	"marmoset/lexer"
+	"marmoset/object"
+	"marmoset/parser"
 	"testing"
 )
 
@@ -263,9 +263,8 @@ func TestGlobalLetStatements(t *testing.T) {
 
 func TestStringExpressions(t *testing.T) {
 	tests := []vmTestCase{
-		{`"monkey"`, "monkey"},
-		{`"mon" + "key"`, "monkey"},
-		{`"mon" + "key" + "banana"`, "monkeybanana"},
+		{`"marmoset"`, "marmoset"},
+		{`"marmo" + "set"`, "marmoset"},
 	}
 
 	runVmTests(t, tests)

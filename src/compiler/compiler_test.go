@@ -2,11 +2,11 @@ package compiler
 
 import (
 	"fmt"
-	"monkey/ast"
-	"monkey/code"
-	"monkey/lexer"
-	"monkey/object"
-	"monkey/parser"
+	"marmoset/ast"
+	"marmoset/code"
+	"marmoset/lexer"
+	"marmoset/object"
+	"marmoset/parser"
 	"testing"
 )
 
@@ -422,16 +422,16 @@ two;
 func TestStringExpressions(t *testing.T) {
 	tests := []compilerTestCase{
 		{
-			input:             `"monkey"`,
-			expectedConstants: []interface{}{"monkey"},
+			input:             `"marmoset"`,
+			expectedConstants: []interface{}{"marmoset"},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.OpConstant, 0),
 				code.Make(code.OpPop),
 			},
 		},
 		{
-			input:             `"mon" + "key"`,
-			expectedConstants: []interface{}{"mon", "key"},
+			input:             `"marm" + "oset"`,
+			expectedConstants: []interface{}{"marm", "oset"},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.OpConstant, 0),
 				code.Make(code.OpConstant, 1),

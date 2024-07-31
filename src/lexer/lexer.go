@@ -2,7 +2,7 @@ package lexer
 
 import (
 	"bytes"
-	"monkey/token"
+	"marmoset/token"
 )
 
 type Lexer struct {
