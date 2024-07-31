@@ -18,7 +18,7 @@ type Args struct {
 	UseInterpreter bool
 }
 
-func New() *Args {
+func NewArgs() *Args {
 	args := &Args{}
 
 	argsWithoutProg := os.Args[1:]
