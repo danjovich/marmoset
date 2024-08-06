@@ -102,7 +102,7 @@ var Builtins = []struct {
 			},
 		},
 	},
-	// pushes element copied array
+	// pushes element to copied array
 	{"push",
 		&Builtin{
 			Fn: func(args ...Object) Object {
