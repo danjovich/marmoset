@@ -6,14 +6,14 @@ import (
 )
 
 func TestNextToken(t *testing.T) {
-	input := `let five = 5;
-let ten = 10;
+	input := `int five = 5;
+int ten = 10;
 
-fn add(x, y) {
+int add(int x, int y) {
 	x + y;
 };
 
-let result = add(five, ten);
+int result = add(five, ten);
 !-/*5;
 5 < 10 > 5;
 
@@ -25,33 +25,39 @@ if (5 < 10) {
 
 10 == 10;
 10 != 9;
-"foobar"
+char[6] foobar = "foobar"
 "foo bar"
 "foo \" bar"
 "foo \n\r\t bar"
 [1, 2];
 {"foo": "bar"}
+
+void func() { }
+
+bool var = true;
 `
 
 	tests := []struct {
 		expectedType    token.TokenType
 		expectedLiteral string
 	}{
-		{token.LET, "let"},
+		{token.INT, "int"},
 		{token.IDENT, "five"},
 		{token.ASSIGN, "="},
-		{token.INT, "5"},
+		{token.INT_LIT, "5"},
 		{token.SEMICOLON, ";"},
-		{token.LET, "let"},
+		{token.INT, "int"},
 		{token.IDENT, "ten"},
 		{token.ASSIGN, "="},
-		{token.INT, "10"},
+		{token.INT_LIT, "10"},
 		{token.SEMICOLON, ";"},
-		{token.FUNCTION, "fn"},
+		{token.INT, "int"},
 		{token.IDENT, "add"},
 		{token.LPAREN, "("},
+		{token.INT, "int"},
 		{token.IDENT, "x"},
 		{token.COMMA, ","},
+		{token.INT, "int"},
 		{token.IDENT, "y"},
 		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
@@ -61,7 +67,7 @@ if (5 < 10) {
 		{token.SEMICOLON, ";"},
 		{token.RBRACE, "}"},
 		{token.SEMICOLON, ";"},
-		{token.LET, "let"},
+		{token.INT, "int"},
 		{token.IDENT, "result"},
 		{token.ASSIGN, "="},
 		{token.IDENT, "add"},
@@ -75,19 +81,19 @@ if (5 < 10) {
 		{token.MINUS, "-"},
 		{token.SLASH, "/"},
 		{token.ASTERISK, "*"},
-		{token.INT, "5"},
+		{token.INT_LIT, "5"},
 		{token.SEMICOLON, ";"},
-		{token.INT, "5"},
+		{token.INT_LIT, "5"},
 		{token.LT, "<"},
-		{token.INT, "10"},
+		{token.INT_LIT, "10"},
 		{token.GT, ">"},
-		{token.INT, "5"},
+		{token.INT_LIT, "5"},
 		{token.SEMICOLON, ";"},
 		{token.IF, "if"},
 		{token.LPAREN, "("},
-		{token.INT, "5"},
+		{token.INT_LIT, "5"},
 		{token.LT, "<"},
-		{token.INT, "10"},
+		{token.INT_LIT, "10"},
 		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
 		{token.RETURN, "return"},
@@ -100,29 +106,46 @@ if (5 < 10) {
 		{token.FALSE, "false"},
 		{token.SEMICOLON, ";"},
 		{token.RBRACE, "}"},
-		{token.INT, "10"},
+		{token.INT_LIT, "10"},
 		{token.EQ, "=="},
-		{token.INT, "10"},
+		{token.INT_LIT, "10"},
 		{token.SEMICOLON, ";"},
-		{token.INT, "10"},
+		{token.INT_LIT, "10"},
 		{token.NOT_EQ, "!="},
-		{token.INT, "9"},
+		{token.INT_LIT, "9"},
 		{token.SEMICOLON, ";"},
-		{token.STRING, "foobar"},
-		{token.STRING, "foo bar"},
-		{token.STRING, "foo \" bar"},
-		{token.STRING, "foo \n\r\t bar"},
+		{token.CHAR, "char"},
 		{token.LBRACKET, "["},
-		{token.INT, "1"},
+		{token.INT_LIT, "6"},
+		{token.RBRACKET, "]"},
+		{token.IDENT, "foobar"},
+		{token.ASSIGN, "="},
+		{token.STRING_LIT, "foobar"},
+		{token.STRING_LIT, "foo bar"},
+		{token.STRING_LIT, "foo \" bar"},
+		{token.STRING_LIT, "foo \n\r\t bar"},
+		{token.LBRACKET, "["},
+		{token.INT_LIT, "1"},
 		{token.COMMA, ","},
-		{token.INT, "2"},
+		{token.INT_LIT, "2"},
 		{token.RBRACKET, "]"},
 		{token.SEMICOLON, ";"},
 		{token.LBRACE, "{"},
-		{token.STRING, "foo"},
+		{token.STRING_LIT, "foo"},
 		{token.COLON, ":"},
-		{token.STRING, "bar"},
+		{token.STRING_LIT, "bar"},
 		{token.RBRACE, "}"},
+		{token.VOID, "void"},
+		{token.IDENT, "func"},
+		{token.LPAREN, "("},
+		{token.RPAREN, ")"},
+		{token.LBRACE, "{"},
+		{token.RBRACE, "}"},
+		{token.BOOL, "bool"},
+		{token.IDENT, "var"},
+		{token.ASSIGN, "="},
+		{token.TRUE, "true"},
+		{token.SEMICOLON, ";"},
 		{token.EOF, ""},
 	}
 

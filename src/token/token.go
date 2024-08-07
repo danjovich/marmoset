@@ -15,9 +15,16 @@ const (
 	EOF     = "EOF"
 
 	// Identifiers + literals
-	IDENT  = "IDENT" // add, foobar, x, y, ...
-	INT    = "INT"   // 1343456
-	STRING = "STRING"
+	IDENT      = "IDENT"   // add, foobar, x, y, ...
+	INT_LIT    = "INT_LIT" // 1, 2, 3, -1, ...
+	STRING_LIT = "STRING_LIT"
+	CHAR_LIT   = "CHAR_LIT"
+
+	// Types
+	INT  = "INT"
+	CHAR = "CHAR"
+	VOID = "VOID"
+	BOOL = "BOOL"
 
 	// Operators
 	ASSIGN   = "="
@@ -47,6 +54,7 @@ const (
 	RBRACKET = "]"
 
 	// Keywords
+	// TODO: Remove let and function
 	FUNCTION = "FUNCTION"
 	LET      = "LET"
 	TRUE     = "TRUE"
@@ -64,6 +72,11 @@ var keywords = map[string]TokenType{
 	"if":     IF,
 	"else":   ELSE,
 	"return": RETURN,
+	// types
+	"int":  INT,
+	"char": CHAR,
+	"void": VOID,
+	"bool": BOOL,
 }
 
 func LookupIdent(ident string) TokenType {
