@@ -178,8 +178,7 @@ func Make(op code.Opcode, index int, operands ...interface{}) (string, error) {
 		return fmt.Sprintf(`L%d:  @OpGetBuiltin`, index), nil
 	}
 
-	return "", nil
-	// return "", fmt.Errorf("unknown operator: %d", op)
+	return "", fmt.Errorf("unknown operator: %d", op)
 }
 
 func makeBinaryOperation(op code.Opcode, index int) string {
