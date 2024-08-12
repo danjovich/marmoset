@@ -59,8 +59,6 @@ func (ls *LetStatement) String() string {
 	return out.String()
 }
 
-func (i *Identifier) String() string { return i.Value }
-
 // return statement
 type ReturnStatement struct {
 	Token       token.Token // the 'return' token
@@ -103,9 +101,8 @@ func (es *ExpressionStatement) String() string {
 
 // identifier
 type Identifier struct {
-	Token          token.Token // the token.IDENT token
-	Value          string
-	IdentifierType Type
+	Token token.Token // the token.IDENT token
+	Value string
 }
 
 func (i *Identifier) expressionNode() {
@@ -116,9 +113,7 @@ func (i *Identifier) TokenLiteral() string {
 	return i.Token.Literal
 }
 
-func (i *Identifier) GetType() Type {
-	return i.IdentifierType
-}
+func (i *Identifier) String() string { return i.Value }
 
 // integer literals
 type IntegerLiteral struct {
@@ -129,14 +124,12 @@ type IntegerLiteral struct {
 func (il *IntegerLiteral) expressionNode()      {}
 func (il *IntegerLiteral) TokenLiteral() string { return il.Token.Literal }
 func (il *IntegerLiteral) String() string       { return il.Token.Literal }
-func (il *IntegerLiteral) GetType() Type        { return INT }
 
 // prefix expressions
 type PrefixExpression struct {
-	Token          token.Token // The prefix token, e.g. !
-	Operator       string
-	Right          Expression
-	ExpressionType Type
+	Token    token.Token // The prefix token, e.g. !
+	Operator string
+	Right    Expression
 }
 
 func (pe *PrefixExpression) expressionNode()      {}
@@ -149,15 +142,13 @@ func (pe *PrefixExpression) String() string {
 	out.WriteString(")")
 	return out.String()
 }
-func (pe *PrefixExpression) GetType() Type { return pe.ExpressionType }
 
 // infix expressions
 type InfixExpression struct {
-	Token          token.Token // The operator token, e.g. +
-	Left           Expression
-	Operator       string
-	Right          Expression
-	ExpressionType Type
+	Token    token.Token // The operator token, e.g. +
+	Left     Expression
+	Operator string
+	Right    Expression
 }
 
 func (oe *InfixExpression) expressionNode()      {}
@@ -171,7 +162,6 @@ func (oe *InfixExpression) String() string {
 	out.WriteString(")")
 	return out.String()
 }
-func (oe *InfixExpression) GetType() Type { return oe.ExpressionType }
 
 // boolean literals
 type Boolean struct {
@@ -182,15 +172,13 @@ type Boolean struct {
 func (b *Boolean) expressionNode()      {}
 func (b *Boolean) TokenLiteral() string { return b.Token.Literal }
 func (b *Boolean) String() string       { return b.Token.Literal }
-func (b *Boolean) GetType() Type        { return BOOL }
 
 // if statements
 type IfExpression struct {
-	Token          token.Token // The 'if' token
-	Condition      Expression
-	Consequence    *BlockStatement
-	Alternative    *BlockStatement
-	ExpressionType Type
+	Token       token.Token // The 'if' token
+	Condition   Expression
+	Consequence *BlockStatement
+	Alternative *BlockStatement
 }
 
 func (ie *IfExpression) expressionNode()      {}
@@ -209,7 +197,6 @@ func (ie *IfExpression) String() string {
 
 	return out.String()
 }
-func (ie *IfExpression) GetType() Type { return ie.ExpressionType }
 
 // block statement (series of statements)
 type BlockStatement struct {
@@ -260,10 +247,9 @@ func (fe *FunctionStatement) String() string {
 
 // call expressions
 type CallExpression struct {
-	Token          token.Token // The '(' token
-	Function       Expression  // Identifier or FunctionStatement
-	Arguments      []Expression
-	ExpressionType Type
+	Token     token.Token // The '(' token
+	Function  Expression  // Identifier or FunctionStatement
+	Arguments []Expression
 }
 
 func (ce *CallExpression) expressionNode()      {}
@@ -283,7 +269,6 @@ func (ce *CallExpression) String() string {
 
 	return out.String()
 }
-func (ce *CallExpression) GetType() Type { return ce.ExpressionType }
 
 // string literals
 type StringLiteral struct {
@@ -294,7 +279,6 @@ type StringLiteral struct {
 func (sl *StringLiteral) expressionNode()      {}
 func (sl *StringLiteral) TokenLiteral() string { return sl.Token.Literal }
 func (sl *StringLiteral) String() string       { return sl.Token.Literal }
-func (sl *StringLiteral) GetType() Type        { return POINTER }
 
 // array literals
 type ArrayLiteral struct {
@@ -318,14 +302,12 @@ func (al *ArrayLiteral) String() string {
 
 	return out.String()
 }
-func (al *ArrayLiteral) GetType() Type { return POINTER }
 
 // index expression
 type IndexExpression struct {
-	Token          token.Token // The [ token
-	Left           Expression
-	Index          Expression
-	ExpressionType Type
+	Token token.Token // The [ token
+	Left  Expression
+	Index Expression
 }
 
 func (ie *IndexExpression) expressionNode()      {}
@@ -341,4 +323,3 @@ func (ie *IndexExpression) String() string {
 
 	return out.String()
 }
-func (ie *IndexExpression) GetType() Type { return ie.ExpressionType }

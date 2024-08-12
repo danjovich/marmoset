@@ -11,18 +11,7 @@ type Statement interface {
 	statementNode()
 }
 
-type Type int
-
-const (
-	INT = iota
-	CHAR
-	BOOL
-	VOID
-	POINTER
-)
-
 type Expression interface {
 	Node
 	expressionNode()
-	GetType() Type
 }
