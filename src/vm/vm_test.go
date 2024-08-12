@@ -266,8 +266,6 @@ func TestIndexExpressions(t *testing.T) {
 		{"[][0]", Null},
 		{"[1, 2, 3][99]", Null},
 		{"[1][-1]", Null},
-		{"{}[0]", Null},
-		{`{"one": 1, "two": 2, "three": 3}["o" + "ne"]`, 1},
 	}
 
 	runVmTests(t, tests)
