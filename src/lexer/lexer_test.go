@@ -6,14 +6,14 @@ import (
 )
 
 func TestNextToken(t *testing.T) {
-	input := `int five = 5;
-int ten = 10;
+	input := `let five = 5;
+let ten = 10;
 
-int add(int x, int y) {
+fn add(x: int, y: int): int {
 	x + y;
 };
 
-int result = add(five, ten);
+let result = add(five, ten);
 !-/*5;
 5 < 10 > 5;
 
@@ -25,41 +25,45 @@ if (5 < 10) {
 
 10 == 10;
 10 != 9;
-char[6] foobar = "foobar"
+let foobar = "foobar"
 "foo bar"
 "foo \" bar"
 "foo \n\r\t bar"
 [1, 2];
 {"foo": "bar"}
 
-void func() { }
+fn func(arg: char[]): void { }
 
-bool var = true;
+let var = true;
 `
 
 	tests := []struct {
 		expectedType    token.TokenType
 		expectedLiteral string
 	}{
-		{token.INT, "int"},
+		{token.LET, "let"},
 		{token.IDENT, "five"},
 		{token.ASSIGN, "="},
 		{token.INT_LIT, "5"},
 		{token.SEMICOLON, ";"},
-		{token.INT, "int"},
+		{token.LET, "let"},
 		{token.IDENT, "ten"},
 		{token.ASSIGN, "="},
 		{token.INT_LIT, "10"},
 		{token.SEMICOLON, ";"},
-		{token.INT, "int"},
+		{token.FUNCTION, "fn"},
 		{token.IDENT, "add"},
 		{token.LPAREN, "("},
-		{token.INT, "int"},
 		{token.IDENT, "x"},
-		{token.COMMA, ","},
+		{token.COLON, ":"},
 		{token.INT, "int"},
+		{token.COMMA, ","},
 		{token.IDENT, "y"},
+		{token.COLON, ":"},
+		{token.INT, "int"},
 		{token.RPAREN, ")"},
+		{token.COLON, ":"},
+		{token.INT, "int"},
 		{token.LBRACE, "{"},
 		{token.IDENT, "x"},
 		{token.PLUS, "+"},
@@ -67,7 +71,7 @@ bool var = true;
 		{token.SEMICOLON, ";"},
 		{token.RBRACE, "}"},
 		{token.SEMICOLON, ";"},
-		{token.INT, "int"},
+		{token.LET, "let"},
 		{token.IDENT, "result"},
 		{token.ASSIGN, "="},
 		{token.IDENT, "add"},
@@ -114,10 +118,7 @@ bool var = true;
 		{token.NOT_EQ, "!="},
 		{token.INT_LIT, "9"},
 		{token.SEMICOLON, ";"},
-		{token.CHAR, "char"},
-		{token.LBRACKET, "["},
-		{token.INT_LIT, "6"},
-		{token.RBRACKET, "]"},
+		{token.LET, "let"},
 		{token.IDENT, "foobar"},
 		{token.ASSIGN, "="},
 		{token.STRING_LIT, "foobar"},
@@ -135,13 +136,20 @@ bool var = true;
 		{token.COLON, ":"},
 		{token.STRING_LIT, "bar"},
 		{token.RBRACE, "}"},
-		{token.VOID, "void"},
+		{token.FUNCTION, "fn"},
 		{token.IDENT, "func"},
 		{token.LPAREN, "("},
+		{token.IDENT, "arg"},
+		{token.COLON, ":"},
+		{token.CHAR, "char"},
+		{token.LBRACKET, "["},
+		{token.RBRACKET, "]"},
 		{token.RPAREN, ")"},
+		{token.COLON, ":"},
+		{token.VOID, "void"},
 		{token.LBRACE, "{"},
 		{token.RBRACE, "}"},
-		{token.BOOL, "bool"},
+		{token.LET, "let"},
 		{token.IDENT, "var"},
 		{token.ASSIGN, "="},
 		{token.TRUE, "true"},
