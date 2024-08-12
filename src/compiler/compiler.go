@@ -265,6 +265,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 			Instructions:  instructions,
 			NumLocals:     numLocals,
 			NumParameters: len(node.Parameters),
+			Name:          node.Name.Value,
 		}
 		// emits an instruction to push the CompiledFunction as a constant
 		c.emit(code.OpConstant, c.addConstant(compiledFn))

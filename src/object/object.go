@@ -142,6 +142,7 @@ type CompiledFunction struct {
 	Instructions  code.Instructions
 	NumLocals     int // amount of local variables in a function
 	NumParameters int
+	Name          string
 }
 
 func (cf *CompiledFunction) Type() ObjectType { return COMPILED_FUNCTION_OBJ }

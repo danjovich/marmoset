@@ -26,7 +26,7 @@ type VM struct {
 }
 
 func New(bytecode *compiler.Bytecode) *VM {
-	mainFn := &object.CompiledFunction{Instructions: bytecode.Instructions}
+	mainFn := &object.CompiledFunction{Instructions: bytecode.Instructions, Name: "main"}
 	mainFrame := NewFrame(mainFn, 0)
 	frames := make([]*Frame, MaxFrames)
 	frames[0] = mainFrame
