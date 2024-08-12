@@ -40,8 +40,6 @@ const (
 	OpSetGlobal
 	// pushes array last values on the stack (passes length as an argument)
 	OpArray
-	// pushes hash from keys and values on the stack (passes length as an argument)
-	OpHash
 	// index operator that applies the last stack value as index to the second-last stack value (object)
 	OpIndex
 	// calls function with (constant pool) index at the top of the stack
@@ -85,7 +83,6 @@ var definitions = map[Opcode]*Definition{
 	OpGetGlobal:     {"OpGetGlobal", []int{2}},
 	OpSetGlobal:     {"OpSetGlobal", []int{2}},
 	OpArray:         {"OpArray", []int{2}},
-	OpHash:          {"OpHash", []int{2}},
 	OpIndex:         {"OpIndex", []int{}},
 	OpCall:          {"OpCall", []int{1}},
 	OpReturnValue:   {"OpReturnValue", []int{}},

@@ -30,7 +30,6 @@ let foobar = "foobar"
 "foo \" bar"
 "foo \n\r\t bar"
 [1, 2];
-{"foo": "bar"}
 
 fn func(arg: char[]): void { }
 
@@ -131,11 +130,6 @@ let var = true;
 		{token.INT_LIT, "2"},
 		{token.RBRACKET, "]"},
 		{token.SEMICOLON, ";"},
-		{token.LBRACE, "{"},
-		{token.STRING_LIT, "foo"},
-		{token.COLON, ":"},
-		{token.STRING_LIT, "bar"},
-		{token.RBRACE, "}"},
 		{token.FUNCTION, "fn"},
 		{token.IDENT, "func"},
 		{token.LPAREN, "("},
