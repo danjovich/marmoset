@@ -87,3 +87,18 @@ func (s *SymbolTable) DefineBuiltin(index int, name string) Symbol {
 	s.reverseBuiltinStore[index] = name
 	return symbol
 }
+
+func (s *SymbolTable) GetAllGlobalNames() []string {
+	if s.Outer != nil {
+		return s.Outer.GetAllGlobalNames()
+	}
+
+	names := []string{}
+	for name, symbol := range s.store {
+		if symbol.Scope == GlobalScope {
+			names = append(names, name)
+		}
+	}
+
+	return names
+}

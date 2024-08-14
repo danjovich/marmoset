@@ -5,250 +5,278 @@ import (
 	"marmoset/code"
 )
 
-func Make(op code.Opcode, index int, operands ...interface{}) (string, error) {
+// returns the AArch32 assembly instructions corresponding to the opcode, ip and operands given,
+// and also returns the amount of pushes - pops that the assembly
+func Make(op code.Opcode, index int, scopeName string, operands ...any) (string, int, error) {
+	label := fmt.Sprintf("L%d%s", index, scopeName)
 	switch op {
 	case code.OpConstant:
 		if len(operands) < 1 {
-			return "", fmt.Errorf("OpConstant should have at least one operand")
+			return "", 0, fmt.Errorf("OpConstant should have at least one operand")
 		}
-		result := []byte{}
+		result := []byte(fmt.Sprintf(`%s:  @OpConstant
+`, label))
+		stackChanges := 0
 		for _, operand := range operands {
-			result = fmt.Appendf(result, `L%d:  @OpConstant
-	mov r0, %s
-	push {r0}`, index, operand)
+			result = fmt.Appendf(result, `	mov r0, %s
+	push {r0}
+`, operand)
+			stackChanges++
 		}
-		return string(result), nil
+		return string(result), stackChanges, nil
 
 	case code.OpAdd, code.OpSub, code.OpMul, code.OpDiv:
 		if len(operands) != 0 {
-			return "", fmt.Errorf("binary operations should not have any operands")
+			return "", 0, fmt.Errorf("binary operations should not have any operands")
 		}
-		return makeBinaryOperation(op, index), nil
+		return makeBinaryOperation(op, label), -1, nil
 
 	case code.OpPop:
 		// TODO: pop of arrays (maybe an "array pointer", similar to stack pointer, or check previous instruction on compiler)
 		if len(operands) != 0 {
-			return "", fmt.Errorf("OpPop should not have any operands")
+			return "", 0, fmt.Errorf("OpPop should not have any operands")
 		}
-		return fmt.Sprintf(`L%d:  @OpPop
-	pop {r0}`, index), nil
+		return fmt.Sprintf(`%s:  @OpPop
+	pop {r0}
+`, label), -1, nil
 
 	case code.OpTrue, code.OpFalse:
 		if len(operands) != 0 {
-			return "", fmt.Errorf("booleans should not have any operands")
+			return "", 0, fmt.Errorf("booleans should not have any operands")
 		}
-		return makeBoolean(op == code.OpTrue, index), nil
+		return makeBoolean(op == code.OpTrue, label), 1, nil
 
 	case code.OpEqual, code.OpNotEqual, code.OpGreaterThan:
 		if len(operands) != 0 {
-			return "", fmt.Errorf("comparisons should not have any operands")
+			return "", 0, fmt.Errorf("comparisons should not have any operands")
 		}
-		return makeComparison(op, index), nil
+		return makeComparison(op, label), -1, nil
 
 	case code.OpMinus:
 		if len(operands) != 0 {
-			return "", fmt.Errorf("OpMinus should not have any operands")
+			return "", 0, fmt.Errorf("OpMinus should not have any operands")
 		}
-		return fmt.Sprintf(`L%d:  @OpMinus
+		return fmt.Sprintf(`%s:  @OpMinus
 	pop {r0}
 	sub r0, #0, r0
-	push {r0}`, index), nil
+	push {r0}
+`, label), 0, nil
 
 	case code.OpBang:
 		if len(operands) != 0 {
-			return "", fmt.Errorf("OpBang should not have any operands")
+			return "", 0, fmt.Errorf("OpBang should not have any operands")
 		}
-		return fmt.Sprintf(`L%d:  @OpBang
+		return fmt.Sprintf(`%s:  @OpBang
 	mov r1, #0
 	pop {r0}
 	cmp r0, #0
 	moveq r1, #1
-	push {r1}`, index), nil
+	push {r1}
+`, label), 0, nil
 
 	case code.OpJumpNotTruthy:
 		if len(operands) != 1 {
-			return "", fmt.Errorf("OpJumpNotTruthy should have only one operand")
+			return "", 0, fmt.Errorf("OpJumpNotTruthy should have only one operand")
 		}
 		dest := operands[0]
-		return fmt.Sprintf(`L%d:  @OpJumpNotTruthy
+		return fmt.Sprintf(`%s:  @OpJumpNotTruthy
 	pop {r0}
 	cmp r0, #0
-	beq %s`, index, dest), nil
+	beq %s
+`, label, dest), -1, nil
 
 	case code.OpJump:
 		if len(operands) != 1 {
-			return "", fmt.Errorf("OpJump should have only one operand")
+			return "", 0, fmt.Errorf("OpJump should have only one operand")
 		}
 		dest := operands[0]
-		return fmt.Sprintf(`L%d:  @OpJump
-	b %s`, index, dest), nil
+		return fmt.Sprintf(`%s:  @OpJump
+	b %s
+`, label, dest), 0, nil
 
 	case code.OpNull:
 		if len(operands) != 0 {
-			return "", fmt.Errorf("OpNull should not have any operands")
+			return "", 0, fmt.Errorf("OpNull should not have any operands")
 		}
-		return fmt.Sprintf(`L%d:  @OpNull
+		return fmt.Sprintf(`%s:  @OpNull
 	mov r0, #0
-	push {r0}`, index), nil
+	push {r0}
+`, label), 1, nil
 
 	case code.OpGetGlobal:
 		if len(operands) != 1 {
-			return "", fmt.Errorf("OpGetGlobal should have only one operand")
+			return "", 0, fmt.Errorf("OpGetGlobal should have only one operand")
 		}
 		name := operands[0]
-		return fmt.Sprintf(`L%d:  @OpGetGlobal
-	ldr r0, =%s
-	push {r0}`, index, name), nil
+		return fmt.Sprintf(`%s:  @OpGetGlobal
+	ldr r0, #_%s
+	push {r0}
+`, label, name), 1, nil
 
 	case code.OpSetGlobal:
 		if len(operands) != 1 {
-			return "", fmt.Errorf("OpSetGlobal should have only one operand")
+			return "", 0, fmt.Errorf("OpSetGlobal should have only one operand")
 		}
 		name := operands[0]
-		return fmt.Sprintf(`L%d:  @OpSetGlobal
+		return fmt.Sprintf(`%s:  @OpSetGlobal
 	pop {r0}
-	str r0, =%s`, index, name), nil
+	str r0, #_%s
+`, label, name), -1, nil
 
 	case code.OpArray:
 		if len(operands) != 1 {
-			return "", fmt.Errorf("OpArray should have only one operand")
+			return "", 0, fmt.Errorf("OpArray should have only one operand")
 		}
 		length := operands[0]
-		return fmt.Sprintf(`L%d:  @OpArray
+		// arrays must push their length and memory location
+		return fmt.Sprintf(`%s:  @OpArray
 	mov r0, #%d
-	push {r0}`, index, length), nil
+	push {r0}
+	sub r0, sp, #4
+	push {r0}
+`, label, length), 2, nil
 
 	case code.OpIndex:
 		if len(operands) != 0 {
-			return "", fmt.Errorf("OpIndex should not have any operands")
+			return "", 0, fmt.Errorf("OpIndex should not have any operands")
 		}
+		// r3 = location of array
 		// r0 = index, r1 = length
 		// r2 = length - index - 1 // because its zero-indexed
 		// r0 = mem[sp + r2 * 4] // same as r0 = arr[index]
 		// return r0
-		return fmt.Sprintf(`L%d:  @OpIndex
-	pop {r0, r1}
+		return fmt.Sprintf(`%s:  @OpIndex
+	pop {r3} 
+	ldr r0, [r3, #4]
+	ldr r1, [r3, #8]
 	sub r2, r1, r0
 	sub r2, r2, #1
 	ldr r0, [sp, r2, lsl #2]
 	push {r0}
-	`, index), nil
+`, label), 0, nil
 
 	case code.OpCall:
 		if len(operands) != 1 {
-			return "", fmt.Errorf("OpCall should have only one operand")
+			return "", 0, fmt.Errorf("OpCall should have only one operand")
 		}
 		numArgs, ok := operands[0].(int)
 		if !ok {
-			return "", fmt.Errorf("OpCall argument should be an integer")
+			return "", 0, fmt.Errorf("OpCall argument should be an integer")
 		}
 		// should jump to the function memory position (on stack before arguments)
-		return fmt.Sprintf(`L%d:  @OpCall
+		return fmt.Sprintf(`%s:  @OpCall
 	add r0, sp, #%d
 	mov fp, r0
-	ldr pc, [fp]`, index, numArgs*4), nil
+	ldr pc, [fp]
+`, label, numArgs*4), 0, nil
 
 	case code.OpReturnValue:
 		if len(operands) != 0 {
-			return "", fmt.Errorf("OpReturnValue should not have any operands")
+			return "", 0, fmt.Errorf("OpReturnValue should not have any operands")
 		}
-		return fmt.Sprintf(`L%d:  @OpReturnValue
+		return fmt.Sprintf(`%s:  @OpReturnValue
 	pop {r0}
 	mov sp, fp
 	push {r0}
-	b lr`, index), nil
+	mov pc, lr
+`, label), 0, nil
 
 	case code.OpReturn:
 		if len(operands) != 0 {
-			return "", fmt.Errorf("OpReturn should not have any operands")
+			return "", 0, fmt.Errorf("OpReturn should not have any operands")
 		}
 		// empty returns return null!
-		return fmt.Sprintf(`L%d:  @OpReturn
+		return fmt.Sprintf(`%s:  @OpReturn
 	mov sp, fp
 	mov r0, #0
 	push {r0}
-	b lr`, index), nil
+	mov pc, lr
+`, label), 0, nil
 
 	case code.OpGetLocal:
-		// TODO: in the compiler, the name here should be name + 'some_hash' to avoid conflict with globals
 		if len(operands) != 1 {
-			return "", fmt.Errorf("OpGetLocal should have only one operand")
+			return "", 0, fmt.Errorf("OpGetLocal should have only one operand")
 		}
-		name := operands[0]
-		return fmt.Sprintf(`L%d:  @OpGetLocal
-	ldr r0, =%s
-	push {r0}`, index, name), nil
+		stackChanges, ok := operands[0].(int)
+		if !ok {
+			return "", 0, fmt.Errorf("OpGetLocal first argument should be an integer")
+		}
+		return fmt.Sprintf(`%s:  @OpGetLocal
+	add r0, sp, #%d
+	ldr r1, [r0]
+	push {r1}
+`, label, stackChanges*4), 1, nil
 
 	case code.OpSetLocal:
-		// TODO: in the compiler, the name here should be name + 'some_hash' to avoid conflict with globals
-		// or no name at all -> stack pointer address
-		if len(operands) != 1 {
-			return "", fmt.Errorf("OpSetLocal should have only one operand")
+		if len(operands) != 0 {
+			return "", 0, fmt.Errorf("OpSetLocal should not have any operands")
 		}
-		name := operands[0]
-		return fmt.Sprintf(`L%d:  @OpSetLocal
-	pop {r0}
-	str r0, =%s`, index, name), nil
+		return fmt.Sprintf(`%s:  @OpSetLocal
+`, label), 0, nil
 
 	case code.OpGetBuiltin:
 		// TODO: implement builtins get and call
 		if len(operands) != 0 {
-			return "", fmt.Errorf("OpGetBuiltin should not have any operands")
+			return "", 0, fmt.Errorf("OpGetBuiltin should not have any operands")
 		}
-		return fmt.Sprintf(`L%d:  @OpGetBuiltin`, index), nil
+		return fmt.Sprintf(`%s:  @OpGetBuiltin
+`, label), 0, nil
 	}
 
-	return "", fmt.Errorf("unknown operator: %d", op)
+	return "", 0, fmt.Errorf("unknown operator: %d", op)
 }
 
-func makeBinaryOperation(op code.Opcode, index int) string {
-	format := `L%d:  @Op%s
+func makeBinaryOperation(op code.Opcode, label string) string {
+	format := `%s:  @Op%s
 	pop {r1, r2}
 	%s
-	push {r0}`
+	push {r0}
+`
 
 	switch op {
 	case code.OpAdd:
-		return fmt.Sprintf(format, index, "Add", "add r0, r1, r2")
+		return fmt.Sprintf(format, label, "Add", "add r0, r1, r2")
 	case code.OpSub:
-		return fmt.Sprintf(format, index, "Sub", "sub r0, r1, r2")
+		return fmt.Sprintf(format, label, "Sub", "sub r0, r1, r2")
 	case code.OpMul:
-		return fmt.Sprintf(format, index, "Mul", "mul r0, r1, r2")
+		return fmt.Sprintf(format, label, "Mul", "mul r0, r1, r2")
 	case code.OpDiv:
 		// calls ABI integer division routine
-		return fmt.Sprintf(format, index, "Div", "bl __aeabi_idiv")
+		return fmt.Sprintf(format, label, "Div", "bl __aeabi_idiv")
 	}
 
 	return ""
 }
 
-func makeBoolean(value bool, index int) string {
-	format := `L%d:  @Op%s
+func makeBoolean(value bool, label string) string {
+	format := `%s:  @Op%s
 	mov r0, #%d
-	push {r0}`
+	push {r0}
+`
 
 	if value {
-		return fmt.Sprintf(format, index, "True", 1)
+		return fmt.Sprintf(format, label, "True", 1)
 	}
 
-	return fmt.Sprintf(format, index, "False", 0)
+	return fmt.Sprintf(format, label, "False", 0)
 }
 
-func makeComparison(op code.Opcode, index int) string {
-	format := `L%d:  @Op%s
+func makeComparison(op code.Opcode, label string) string {
+	format := `%s:  @Op%s
 	mov r0, #0
 	pop {r1, r2}
 	cmp r1, r2
 	mov%s r0, #1
-	push {r0}`
+	push {r0}
+`
 
 	switch op {
 	case code.OpEqual:
-		return fmt.Sprintf(format, index, "Equal", "eq")
+		return fmt.Sprintf(format, label, "Equal", "eq")
 	case code.OpNotEqual:
-		return fmt.Sprintf(format, index, "NotEqual", "neq")
+		return fmt.Sprintf(format, label, "NotEqual", "neq")
 	case code.OpGreaterThan:
-		return fmt.Sprintf(format, index, "GreaterThan", "gt")
+		return fmt.Sprintf(format, label, "GreaterThan", "gt")
 	}
 
 	return ""
