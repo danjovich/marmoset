@@ -8,12 +8,16 @@ import (
 func Make(op code.Opcode, index int, operands ...interface{}) (string, error) {
 	switch op {
 	case code.OpConstant:
-		if len(operands) != 1 {
-			return "", fmt.Errorf("OpConstant should have only one operand")
+		if len(operands) < 1 {
+			return "", fmt.Errorf("OpConstant should have at least one operand")
 		}
-		return fmt.Sprintf(`L%d:  @OpConstant
+		result := []byte{}
+		for _, operand := range operands {
+			result = fmt.Appendf(result, `L%d:  @OpConstant
 	mov r0, %s
-	push {r0}`, index, operands[0]), nil
+	push {r0}`, index, operand)
+		}
+		return string(result), nil
 
 	case code.OpAdd, code.OpSub, code.OpMul, code.OpDiv:
 		if len(operands) != 0 {
@@ -22,6 +26,7 @@ func Make(op code.Opcode, index int, operands ...interface{}) (string, error) {
 		return makeBinaryOperation(op, index), nil
 
 	case code.OpPop:
+		// TODO: pop of arrays (maybe an "array pointer", similar to stack pointer, or check previous instruction on compiler)
 		if len(operands) != 0 {
 			return "", fmt.Errorf("OpPop should not have any operands")
 		}
@@ -117,6 +122,10 @@ func Make(op code.Opcode, index int, operands ...interface{}) (string, error) {
 		if len(operands) != 0 {
 			return "", fmt.Errorf("OpIndex should not have any operands")
 		}
+		// r0 = index, r1 = length
+		// r2 = length - index - 1 // because its zero-indexed
+		// r0 = mem[sp + r2 * 4] // same as r0 = arr[index]
+		// return r0
 		return fmt.Sprintf(`L%d:  @OpIndex
 	pop {r0, r1}
 	sub r2, r1, r0
@@ -129,15 +138,24 @@ func Make(op code.Opcode, index int, operands ...interface{}) (string, error) {
 		if len(operands) != 1 {
 			return "", fmt.Errorf("OpCall should have only one operand")
 		}
-		name := operands[0]
+		numArgs, ok := operands[0].(int)
+		if !ok {
+			return "", fmt.Errorf("OpCall argument should be an integer")
+		}
+		// should jump to the function memory position (on stack before arguments)
 		return fmt.Sprintf(`L%d:  @OpCall
-	bl %s`, index, name), nil
+	add r0, sp, #%d
+	mov fp, r0
+	ldr pc, [fp]`, index, numArgs*4), nil
 
 	case code.OpReturnValue:
 		if len(operands) != 0 {
 			return "", fmt.Errorf("OpReturnValue should not have any operands")
 		}
 		return fmt.Sprintf(`L%d:  @OpReturnValue
+	pop {r0}
+	mov sp, fp
+	push {r0}
 	b lr`, index), nil
 
 	case code.OpReturn:
@@ -146,6 +164,7 @@ func Make(op code.Opcode, index int, operands ...interface{}) (string, error) {
 		}
 		// empty returns return null!
 		return fmt.Sprintf(`L%d:  @OpReturn
+	mov sp, fp
 	mov r0, #0
 	push {r0}
 	b lr`, index), nil
@@ -162,6 +181,7 @@ func Make(op code.Opcode, index int, operands ...interface{}) (string, error) {
 
 	case code.OpSetLocal:
 		// TODO: in the compiler, the name here should be name + 'some_hash' to avoid conflict with globals
+		// or no name at all -> stack pointer address
 		if len(operands) != 1 {
 			return "", fmt.Errorf("OpSetLocal should have only one operand")
 		}

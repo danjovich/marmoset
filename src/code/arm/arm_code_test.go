@@ -184,10 +184,6 @@ func TestMake(t *testing.T) {
 			code.OpIndex,
 			0,
 			[]interface{}{},
-			// r0 = index, r1 = length
-			// r2 = length - index - 1 // because its zero-indexed
-			// r0 = mem[sp + r2 * 4] // mesmo que r0 = arr[index]
-			// return r0
 			`L0:  @OpIndex
 	pop {r0, r1}
 	sub r2, r1, r0
@@ -199,17 +195,20 @@ func TestMake(t *testing.T) {
 		{
 			code.OpCall,
 			0,
-			// although the bytecode instruction has the number of args as argument,
-			// here it should receive the function name
-			[]interface{}{"func"},
+			[]interface{}{2},
 			`L0:  @OpCall
-	bl func`,
+	add r0, sp, #8
+	mov fp, r0
+	ldr pc, [fp]`,
 		},
 		{
 			code.OpReturnValue,
 			0,
 			[]interface{}{},
 			`L0:  @OpReturnValue
+	pop {r0}
+	mov sp, fp
+	push {r0}
 	b lr`,
 		},
 		{
@@ -217,6 +216,7 @@ func TestMake(t *testing.T) {
 			0,
 			[]interface{}{},
 			`L0:  @OpReturn
+	mov sp, fp
 	mov r0, #0
 	push {r0}
 	b lr`,
