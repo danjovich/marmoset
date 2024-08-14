@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"marmoset/args"
 	"marmoset/compiler"
 	"marmoset/lexer"
 	"marmoset/object"
@@ -13,7 +14,7 @@ import (
 
 const PROMPT = ">> "
 
-func Start(in io.Reader, out io.Writer, args *Args) {
+func Start(in io.Reader, out io.Writer, args *args.Args) {
 	scanner := bufio.NewScanner(in)
 
 	constants := []object.Object{}
@@ -34,6 +35,7 @@ func Start(in io.Reader, out io.Writer, args *Args) {
 		line := scanner.Text()
 		l := lexer.New(line)
 		p := parser.New(l)
+		p.Verbose = args.Verbose
 		program := p.ParseProgram()
 
 		if len(p.Errors()) != 0 {

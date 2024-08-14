@@ -1,4 +1,4 @@
-package repl
+package args
 
 import (
 	"fmt"
@@ -16,15 +16,23 @@ const (
 type Args struct {
 	Verbose        bool
 	UseInterpreter bool
+	Program        string
 }
 
 func NewArgs() *Args {
 	args := &Args{}
 
 	argsWithoutProg := os.Args[1:]
+
 	if len(argsWithoutProg) > 0 {
 		value := ""
 		r := regexp.MustCompile(`^\-{1,2}[^\-]+`)
+
+		lastIndex := len(argsWithoutProg) - 1
+		if !r.MatchString(argsWithoutProg[lastIndex]) {
+			args.Program = argsWithoutProg[lastIndex]
+			argsWithoutProg = argsWithoutProg[:lastIndex]
+		}
 
 		for i, arg := range argsWithoutProg {
 			if len(argsWithoutProg) > i+1 {
