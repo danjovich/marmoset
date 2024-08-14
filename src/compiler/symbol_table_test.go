@@ -60,15 +60,26 @@ func TestResolveGlobal(t *testing.T) {
 	}
 
 	for _, sym := range expected {
-		result, ok := global.Resolve(sym.Name)
-		if !ok {
+		result1, ok1 := global.Resolve(sym.Name)
+		if !ok1 {
 			t.Errorf("name %s not resolvable", sym.Name)
 			continue
 		}
 
-		if result != sym {
+		if result1 != sym {
 			t.Errorf("expected %s to resolve to %+v, got=%+v",
-				sym.Name, sym, result)
+				sym.Name, sym, result1)
+		}
+
+		result2, ok2 := global.ResolveName(sym.Index, sym.Scope)
+		if !ok2 {
+			t.Errorf("index %d not resolvable", sym.Index)
+			continue
+		}
+
+		if result2 != sym.Name {
+			t.Errorf("expected index %d to resolve to %s, got=%s",
+				sym.Index, sym.Name, result2)
 		}
 	}
 }
@@ -99,6 +110,17 @@ func TestResolveLocal(t *testing.T) {
 		if result != sym {
 			t.Errorf("expected %s to resolve to %+v, got=%+v",
 				sym.Name, sym, result)
+		}
+
+		result2, ok2 := local.ResolveName(sym.Index, sym.Scope)
+		if !ok2 {
+			t.Errorf("index %d not resolvable", sym.Index)
+			continue
+		}
+
+		if result2 != sym.Name {
+			t.Errorf("expected index %d to resolve to %s, got=%s",
+				sym.Index, sym.Name, result2)
 		}
 	}
 }
@@ -151,6 +173,17 @@ func TestResolveNestedLocal(t *testing.T) {
 			if result != sym {
 				t.Errorf("expected %s to resolve to %+v, got=%+v",
 					sym.Name, sym, result)
+			}
+
+			result2, ok2 := tt.table.ResolveName(sym.Index, sym.Scope)
+			if !ok2 {
+				t.Errorf("index %d not resolvable", sym.Index)
+				continue
+			}
+
+			if result2 != sym.Name {
+				t.Errorf("expected index %d to resolve to %s, got=%s",
+					sym.Index, sym.Name, result2)
 			}
 		}
 	}
