@@ -591,10 +591,11 @@ func TestCompilerScopes(t *testing.T) {
 		t.Errorf("scopeIndex wrong. got=%d, want=%d", compiler.scopeIndex, 0)
 	}
 
-	globalSymbolTable := compiler.symbolTable
+	globalSymbolTable := compiler.SymbolTable
 
 	compiler.emit(code.OpMul)
-	compiler.enterScope()
+	scopeName := "Scope"
+	compiler.enterScope(scopeName)
 
 	if compiler.scopeIndex != 1 {
 		t.Errorf("scopeIndex wrong. got=%d, want=%d", compiler.scopeIndex, 1)
@@ -602,19 +603,25 @@ func TestCompilerScopes(t *testing.T) {
 
 	compiler.emit(code.OpSub)
 
-	if len(compiler.scopes[compiler.scopeIndex].instructions) != 1 {
+	if len(compiler.Scopes[compiler.scopeIndex].instructions) != 1 {
 		t.Errorf("instructions length wrong. got=%d",
-			len(compiler.scopes[compiler.scopeIndex].instructions))
+			len(compiler.Scopes[compiler.scopeIndex].instructions))
 	}
 
-	last := compiler.scopes[compiler.scopeIndex].lastInstruction
+	last := compiler.Scopes[compiler.scopeIndex].lastInstruction
 
 	if last.Opcode != code.OpSub {
 		t.Errorf("lastInstruction.Opcode wrong. got=%d, want=%d",
 			last.Opcode, code.OpSub)
 	}
-	if compiler.symbolTable.Outer != globalSymbolTable {
+	if compiler.SymbolTable.Outer != globalSymbolTable {
 		t.Errorf("compiler did not enclose symbolTable")
+	}
+
+	name := compiler.Scopes[compiler.scopeIndex].name
+
+	if name != scopeName {
+		t.Errorf("scope.Name wrong. got=%s, want=%s", name, scopeName)
 	}
 
 	compiler.leaveScope()
@@ -624,28 +631,28 @@ func TestCompilerScopes(t *testing.T) {
 			compiler.scopeIndex, 0)
 	}
 
-	if compiler.symbolTable != globalSymbolTable {
+	if compiler.SymbolTable != globalSymbolTable {
 		t.Errorf("compiler did not restore global symbol table")
 	}
-	if compiler.symbolTable.Outer != nil {
+	if compiler.SymbolTable.Outer != nil {
 		t.Errorf("compiler modified global symbol table incorrectly")
 	}
 
 	compiler.emit(code.OpAdd)
 
-	if len(compiler.scopes[compiler.scopeIndex].instructions) != 2 {
+	if len(compiler.Scopes[compiler.scopeIndex].instructions) != 2 {
 		t.Errorf("instructions length wrong. got=%d",
-			len(compiler.scopes[compiler.scopeIndex].instructions))
+			len(compiler.Scopes[compiler.scopeIndex].instructions))
 	}
 
-	last = compiler.scopes[compiler.scopeIndex].lastInstruction
+	last = compiler.Scopes[compiler.scopeIndex].lastInstruction
 
 	if last.Opcode != code.OpAdd {
 		t.Errorf("lastInstruction.Opcode wrong. got=%d, want=%d",
 			last.Opcode, code.OpAdd)
 	}
 
-	previous := compiler.scopes[compiler.scopeIndex].previousInstruction
+	previous := compiler.Scopes[compiler.scopeIndex].previousInstruction
 
 	if previous.Opcode != code.OpMul {
 		t.Errorf("previousInstruction.Opcode wrong. got=%d, want=%d",
