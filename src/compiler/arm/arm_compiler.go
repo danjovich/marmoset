@@ -23,11 +23,28 @@ func New(compiler *compiler.Compiler) *ArmCompiler {
 func (ac *ArmCompiler) Compile() error {
 	// TODO: use arm-linux-gnueabihf-as?
 
-	symbols := ac.compiler.SymbolTable
 	constants := ac.compiler.Constants
 	globalFunctions := []string{}
 
-	for _, name := range symbols.GetAllGlobalNames() {
+	for _, scope := range ac.compiler.AllScopes {
+		fmt.Printf("%s:\n", scope.Name)
+		if scope.IsMain {
+			fmt.Print("	mov sp, #0x4000\n\n")
+		}
+
+		globalFunctions = append(globalFunctions, scope.Name)
+
+		err := compileFromInstructionsAndSymbols(*scope, constants)
+		if err != nil {
+			return err
+		}
+
+		if scope.IsMain {
+			fmt.Print("_end: b _end\n\n")
+		}
+	}
+
+	for _, name := range ac.compiler.SymbolTable.GetAllGlobalNames() {
 		if !slices.Contains(globalFunctions, name) {
 			fmt.Printf("_%s: .word 0x0\n", name)
 		} else {
@@ -35,26 +52,21 @@ func (ac *ArmCompiler) Compile() error {
 		}
 	}
 
-	fmt.Printf("\n")
-
-	for _, scope := range ac.compiler.AllScopes {
-		fmt.Printf("%s:\n", scope.Name)
-		globalFunctions = append(globalFunctions, scope.Name)
-
-		err := compileFromInstructionsAndSymbols(*scope, constants, symbols)
-		if err != nil {
-			return err
-		}
-	}
-
 	return nil
 }
 
-func compileFromInstructionsAndSymbols(scope compiler.CompilationScope, constants []object.Object, symbols *compiler.SymbolTable) error {
+func compileFromInstructionsAndSymbols(scope compiler.CompilationScope, constants []object.Object) error {
 	ins := scope.Instructions
+	symbols := scope.SymbolTable
 	// locals store declared local variables and counts the amount of changes in the stack since
-	// their declaration to allow for knowing where they are when they are read
+	// their declaration to allow for knowing where they are when they are read.
+	// It's initialized with the scope arguments, which are also locals.
 	locals := make(map[string]int)
+	for i, arg := range scope.Args {
+		// the -(i - len(scope.Args)) - 1 is due to the first arguments being the farthest
+		// in the stack.
+		locals[arg] = -(i - len(scope.Args)) - 1
+	}
 
 	scopeName := fmt.Sprintf("_%s", scope.Name)
 	if scope.IsMain {
@@ -151,7 +163,7 @@ func compileFromInstructionsAndSymbols(scope compiler.CompilationScope, constant
 func generateConstantArgs(constant object.Object) ([]interface{}, error) {
 	switch constant := constant.(type) {
 	case *object.CompiledFunction:
-		result := fmt.Sprintf("#_%s", constant.Name)
+		result := fmt.Sprintf("#%s", constant.Name)
 		return []interface{}{result}, nil
 
 	case *object.Integer:

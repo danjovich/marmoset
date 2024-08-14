@@ -163,12 +163,15 @@ func Make(op code.Opcode, index int, scopeName string, operands ...any) (string,
 		if !ok {
 			return "", 0, fmt.Errorf("OpCall argument should be an integer")
 		}
-		// should jump to the function memory position (on stack before arguments)
+		// should jump to the function memory position (on stack before arguments), and push
+		// the returned value (on r0)
 		return fmt.Sprintf(`%s:  @OpCall
 	add r0, sp, #%d
-	mov fp, r0
-	ldr pc, [fp]
-`, label, numArgs*4), 0, nil
+	mov fp, sp
+	ldr r0, [r0]
+	blx r0
+	push {r0}
+`, label, numArgs*4), 1 - numArgs, nil
 
 	case code.OpReturnValue:
 		if len(operands) != 0 {
@@ -177,7 +180,6 @@ func Make(op code.Opcode, index int, scopeName string, operands ...any) (string,
 		return fmt.Sprintf(`%s:  @OpReturnValue
 	pop {r0}
 	mov sp, fp
-	push {r0}
 	mov pc, lr
 `, label), 0, nil
 
@@ -189,7 +191,6 @@ func Make(op code.Opcode, index int, scopeName string, operands ...any) (string,
 		return fmt.Sprintf(`%s:  @OpReturn
 	mov sp, fp
 	mov r0, #0
-	push {r0}
 	mov pc, lr
 `, label), 0, nil
 
@@ -235,12 +236,13 @@ func makeBinaryOperation(op code.Opcode, label string) string {
 
 	switch op {
 	case code.OpAdd:
-		return fmt.Sprintf(format, label, "Add", "add r0, r1, r2")
+		return fmt.Sprintf(format, label, "Add", "add r0, r2, r1")
 	case code.OpSub:
-		return fmt.Sprintf(format, label, "Sub", "sub r0, r1, r2")
+		return fmt.Sprintf(format, label, "Sub", "sub r0, r2, r1")
 	case code.OpMul:
-		return fmt.Sprintf(format, label, "Mul", "mul r0, r1, r2")
+		return fmt.Sprintf(format, label, "Mul", "mul r0, r2, r1")
 	case code.OpDiv:
+		// TODO: check if args order is right
 		// calls ABI integer division routine
 		return fmt.Sprintf(format, label, "Div", "bl __aeabi_idiv")
 	}

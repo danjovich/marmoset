@@ -27,19 +27,23 @@ type CompilationScope struct {
 	previousInstruction EmittedInstruction // instruction before the last
 	Name                string             // the scope's function name
 	IsMain              bool               // whether it is the main scope or not
+	Args                []string           // list of arguments passed to the scope
+	SymbolTable         *SymbolTable       // symbol table
 }
 
 func New() *Compiler {
+	symbolTable := NewSymbolTable()
+
 	mainScope := CompilationScope{
 		Instructions:        code.Instructions{},
 		lastInstruction:     EmittedInstruction{},
 		previousInstruction: EmittedInstruction{},
 		Name: `.global _start
 _start`,
-		IsMain: true,
+		IsMain:      true,
+		Args:        []string{},
+		SymbolTable: symbolTable,
 	}
-
-	symbolTable := NewSymbolTable()
 
 	for i, v := range object.Builtins {
 		symbolTable.DefineBuiltin(i, v.Name)
@@ -58,6 +62,7 @@ _start`,
 func NewWithState(s *SymbolTable, constants []object.Object) *Compiler {
 	compiler := New()
 	compiler.SymbolTable = s
+	compiler.AllScopes[0].SymbolTable = s
 	compiler.Constants = constants
 	return compiler
 }
@@ -246,7 +251,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 		// defines symbol before compiling function to allow recursive functions to know about their own existence
 		symbol := c.SymbolTable.Define(node.Name.Value)
 		// enters new function scope
-		c.enterScope(node.Name.Value)
+		c.enterScope(node.Name.Value, node.Parameters)
 		// defines function arguments in the current scope symbol table
 		for _, p := range node.Parameters {
 			c.SymbolTable.Define(p.Value)
@@ -320,19 +325,27 @@ func (c *Compiler) loadSymbol(s Symbol) {
 }
 
 // Enters a new scope
-func (c *Compiler) enterScope(name string) {
+func (c *Compiler) enterScope(name string, args []*ast.Identifier) {
+	argsList := []string{}
+	for _, arg := range args {
+		argsList = append(argsList, arg.Value)
+	}
+	newSymbolTable := NewEnclosedSymbolTable(c.SymbolTable)
+
 	scope := CompilationScope{
 		Instructions:        code.Instructions{},
 		lastInstruction:     EmittedInstruction{},
 		previousInstruction: EmittedInstruction{},
 		Name:                name,
 		IsMain:              false,
+		Args:                argsList,
+		SymbolTable:         newSymbolTable,
 	}
 
 	c.scopes = append(c.scopes, &scope)
 	c.AllScopes = append(c.AllScopes, &scope)
 	c.scopeIndex++
-	c.SymbolTable = NewEnclosedSymbolTable(c.SymbolTable)
+	c.SymbolTable = newSymbolTable
 }
 
 // Leaves current scope, returning its instructions

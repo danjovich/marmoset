@@ -47,7 +47,7 @@ func TestMake(t *testing.T) {
 			[]any{},
 			`L0_label:  @OpAdd
 	pop {r1, r2}
-	add r0, r1, r2
+	add r0, r2, r1
 	push {r0}
 `,
 			-1,
@@ -59,7 +59,7 @@ func TestMake(t *testing.T) {
 			[]any{},
 			`L0_label:  @OpSub
 	pop {r1, r2}
-	sub r0, r1, r2
+	sub r0, r2, r1
 	push {r0}
 `,
 			-1,
@@ -71,7 +71,7 @@ func TestMake(t *testing.T) {
 			[]any{},
 			`L0_label:  @OpMul
 	pop {r1, r2}
-	mul r0, r1, r2
+	mul r0, r2, r1
 	push {r0}
 `,
 			-1,
@@ -279,10 +279,12 @@ func TestMake(t *testing.T) {
 			[]any{2},
 			`L0_label:  @OpCall
 	add r0, sp, #8
-	mov fp, r0
-	ldr pc, [fp]
+	mov fp, sp
+	ldr r0, [r0]
+	blx r0
+	push {r0}
 `,
-			0,
+			-1,
 		},
 		{
 			code.OpReturnValue,
@@ -292,7 +294,6 @@ func TestMake(t *testing.T) {
 			`L0_label:  @OpReturnValue
 	pop {r0}
 	mov sp, fp
-	push {r0}
 	mov pc, lr
 `,
 			0,
@@ -305,7 +306,6 @@ func TestMake(t *testing.T) {
 			`L0_label:  @OpReturn
 	mov sp, fp
 	mov r0, #0
-	push {r0}
 	mov pc, lr
 `,
 			0,
