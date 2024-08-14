@@ -27,8 +27,6 @@ func (ac *ArmCompiler) Compile() error {
 	constants := ac.compiler.Constants
 	globalFunctions := []string{}
 
-	fmt.Printf(".data\n")
-
 	for _, name := range symbols.GetAllGlobalNames() {
 		if !slices.Contains(globalFunctions, name) {
 			fmt.Printf("_%s: .word 0x0\n", name)
@@ -37,7 +35,7 @@ func (ac *ArmCompiler) Compile() error {
 		}
 	}
 
-	fmt.Printf(".text\n")
+	fmt.Printf("\n")
 
 	for _, scope := range ac.compiler.AllScopes {
 		fmt.Printf("%s:\n", scope.Name)
