@@ -29,7 +29,7 @@ func (ac *ArmCompiler) Compile() error {
 	for _, scope := range ac.compiler.AllScopes {
 		fmt.Printf("%s:\n", scope.Name)
 		if scope.IsMain {
-			fmt.Print("	mov sp, #0x4000\n\n")
+			fmt.Print("	mov sp, #0x4000\n	mov fp, sp\n\n")
 		}
 
 		globalFunctions = append(globalFunctions, scope.Name)
@@ -58,19 +58,15 @@ func (ac *ArmCompiler) Compile() error {
 func compileFromInstructionsAndSymbols(scope compiler.CompilationScope, constants []object.Object) error {
 	ins := scope.Instructions
 	symbols := scope.SymbolTable
-	// locals store declared local variables and counts the amount of changes in the stack since
-	// their declaration to allow for knowing where they are when they are read.
-	// It's initialized with the scope arguments, which are also locals.
-	locals := make(map[string]int)
-	for i, arg := range scope.Args {
-		// the -(i - len(scope.Args)) - 1 is due to the first arguments being the farthest
-		// in the stack.
-		locals[arg] = -(i - len(scope.Args)) - 1
-	}
 
+	startOfTheStack := 0
 	scopeName := fmt.Sprintf("_%s", scope.Name)
 	if scope.IsMain {
 		scopeName = ""
+	} else {
+		// preamble -> must open space for ALL local variables, including arguments and old lr
+		startOfTheStack = (len(symbols.GetAllLocalNames()) + 1)
+		fmt.Printf("	sub sp, sp, #%d\n\n", startOfTheStack*4)
 	}
 
 	for ip := 0; ip < len(ins); ip++ {
@@ -117,24 +113,12 @@ func compileFromInstructionsAndSymbols(scope compiler.CompilationScope, constant
 		case code.OpSetLocal:
 			localIndex := code.ReadUint8(ins[ip+1:])
 			ip += 1
-			localName, ok := symbols.ResolveName(int(localIndex), compiler.LocalScope)
-			if !ok {
-				return fmt.Errorf("local of index %d not found", localIndex)
-			}
-			// (re)starts the counting of changes in the stack since declaration
-			locals[localName] = 0
+			args = append(args, int(localIndex))
 
 		case code.OpGetLocal:
 			localIndex := code.ReadUint8(ins[ip+1:])
 			ip += 1
-			localName, ok := symbols.ResolveName(int(localIndex), compiler.LocalScope)
-			if !ok {
-				return fmt.Errorf("local of index %d not found", localIndex)
-			}
-			stackChanges := locals[localName]
-			// the amount of stack changes is passed for the generated code to be able to calculate
-			// how far from the current stack pointer the local variable is
-			args = append(args, stackChanges)
+			args = append(args, int(localIndex))
 
 		case code.OpGetBuiltin:
 			builtinIndex := code.ReadUint8(ins[ip+1:])
@@ -144,14 +128,15 @@ func compileFromInstructionsAndSymbols(scope compiler.CompilationScope, constant
 				return fmt.Errorf("builtin of index %d not found", builtinIndex)
 			}
 			args = append(args, builtinName)
+
+		case code.OpReturn, code.OpReturnValue:
+			args = append(args, startOfTheStack)
 		}
 
-		asm, changesInStack, err := arm.Make(op, index, scopeName, args...)
+		asm, _, err := arm.Make(op, index, scopeName, args...)
 		if err != nil {
 			return err
 		}
-		// adds the amount of stack changes to every previously declared local symbol count
-		sumToAllValuesInMap(&locals, changesInStack)
 
 		fmt.Printf("%s\n", asm)
 	}
@@ -185,10 +170,4 @@ func generateConstantArgs(constant object.Object) ([]interface{}, error) {
 	}
 
 	return []interface{}{}, fmt.Errorf("invalid type %T for constant", constant.Type())
-}
-
-func sumToAllValuesInMap(stringIntMap *map[string]int, value int) {
-	for key := range *stringIntMap {
-		(*stringIntMap)[key] += value
-	}
 }

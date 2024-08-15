@@ -102,3 +102,14 @@ func (s *SymbolTable) GetAllGlobalNames() []string {
 
 	return names
 }
+
+func (s *SymbolTable) GetAllLocalNames() []string {
+	localNames := []string{}
+	for _, name := range s.reverseStore {
+		if name == "" {
+			break
+		}
+		localNames = append(localNames, name)
+	}
+	return localNames
+}

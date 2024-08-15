@@ -593,12 +593,20 @@ func TestCompilerScopes(t *testing.T) {
 
 	globalSymbolTable := compiler.SymbolTable
 
+	if globalSymbolTable != compiler.scopes[0].SymbolTable {
+		t.Errorf("compiler.scopes[0].SymbolTable wrong. got=%p, want=%p", compiler.scopes[0].SymbolTable, compiler.SymbolTable)
+	}
+
 	compiler.emit(code.OpMul)
 	scopeName := "Scope"
-	compiler.enterScope(scopeName)
+	compiler.enterScope(scopeName, []*ast.Identifier{})
 
 	if compiler.scopeIndex != 1 {
 		t.Errorf("scopeIndex wrong. got=%d, want=%d", compiler.scopeIndex, 1)
+	}
+
+	if compiler.SymbolTable != compiler.scopes[1].SymbolTable {
+		t.Errorf("compiler.scopes[1].SymbolTable wrong. got=%p, want=%p", compiler.scopes[0].SymbolTable, compiler.SymbolTable)
 	}
 
 	compiler.emit(code.OpSub)

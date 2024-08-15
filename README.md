@@ -11,7 +11,8 @@ Já que a linguagem implementada no livro se chama "monkey", o nome da linguagem
   - [x] Mudar compilação de `let` para evitar que referência a si mesmo cause "null pointer dereference";
   - [x] Para facilitar compilação para ARM, fazer funções não serem mais "cidadãs de primeira classe" (impedir uso como argumento de outras funções).
 - [ ] Talvez remover retornos implícitos;
+  - [ ] Nesse caso, remover opcode de "pop".
 - [x] Remover implementação de hashes;
 - [ ] Criar built-in `gets`;
-- [ ] Compilar arquivos (sem REPL, manter só o REPL de bytecode);
+- [x] Compilar arquivos;
 - [ ] Se sobrar tempo, implementar `while`.

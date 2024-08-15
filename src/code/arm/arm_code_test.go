@@ -50,7 +50,7 @@ func TestMake(t *testing.T) {
 	add r0, r2, r1
 	push {r0}
 `,
-			-1,
+			1,
 		},
 		{
 			code.OpSub,
@@ -62,7 +62,7 @@ func TestMake(t *testing.T) {
 	sub r0, r2, r1
 	push {r0}
 `,
-			-1,
+			1,
 		},
 		{
 			code.OpMul,
@@ -74,7 +74,7 @@ func TestMake(t *testing.T) {
 	mul r0, r2, r1
 	push {r0}
 `,
-			-1,
+			1,
 		},
 		{
 			code.OpDiv,
@@ -86,7 +86,7 @@ func TestMake(t *testing.T) {
 	bl __aeabi_idiv
 	push {r0}
 `,
-			-1,
+			1,
 		},
 		{
 			code.OpPop,
@@ -96,7 +96,7 @@ func TestMake(t *testing.T) {
 			`L0_label:  @OpPop
 	pop {r0}
 `,
-			-1,
+			0,
 		},
 		{
 			code.OpTrue,
@@ -132,7 +132,7 @@ func TestMake(t *testing.T) {
 	moveq r0, #1
 	push {r0}
 `,
-			-1,
+			1,
 		},
 		{
 			code.OpNotEqual,
@@ -146,7 +146,7 @@ func TestMake(t *testing.T) {
 	movneq r0, #1
 	push {r0}
 `,
-			-1,
+			1,
 		},
 		{
 			code.OpGreaterThan,
@@ -160,7 +160,7 @@ func TestMake(t *testing.T) {
 	movgt r0, #1
 	push {r0}
 `,
-			-1,
+			1,
 		},
 		{
 			code.OpMinus,
@@ -172,7 +172,7 @@ func TestMake(t *testing.T) {
 	sub r0, #0, r0
 	push {r0}
 `,
-			0,
+			1,
 		},
 		{
 			code.OpBang,
@@ -186,7 +186,7 @@ func TestMake(t *testing.T) {
 	moveq r1, #1
 	push {r1}
 `,
-			0,
+			1,
 		},
 		{
 			code.OpJumpNotTruthy,
@@ -198,7 +198,7 @@ func TestMake(t *testing.T) {
 	cmp r0, #0
 	beq L2
 `,
-			-1,
+			0,
 		},
 		{
 			code.OpJump,
@@ -241,7 +241,7 @@ func TestMake(t *testing.T) {
 	pop {r0}
 	str r0, #_global_var
 `,
-			-1,
+			0,
 		},
 		{
 			code.OpArray,
@@ -270,7 +270,7 @@ func TestMake(t *testing.T) {
 	ldr r0, [sp, r2, lsl #2]
 	push {r0}
 `,
-			0,
+			1,
 		},
 		{
 			code.OpCall,
@@ -278,23 +278,29 @@ func TestMake(t *testing.T) {
 			"_label",
 			[]any{2},
 			`L0_label:  @OpCall
-	add r0, sp, #8
+	push {lr}
+	add sp, sp, #12
+	ldr r0, [sp]
+	str fp, [sp]
 	mov fp, sp
-	ldr r0, [r0]
 	blx r0
 	push {r0}
 `,
-			-1,
+			1,
 		},
 		{
 			code.OpReturnValue,
 			0,
 			"_label",
-			[]any{},
+			[]any{2},
 			`L0_label:  @OpReturnValue
 	pop {r0}
+	mov r1, lr
+	ldr lr, [fp, #-8]
 	mov sp, fp
-	mov pc, lr
+	ldr fp, [sp]
+	add sp, sp, #4
+	mov pc, r1
 `,
 			0,
 		},
@@ -302,11 +308,15 @@ func TestMake(t *testing.T) {
 			code.OpReturn,
 			0,
 			"_label",
-			[]any{},
+			[]any{3},
 			`L0_label:  @OpReturn
-	mov sp, fp
 	mov r0, #0
-	mov pc, lr
+	mov r1, lr
+	ldr lr, [fp, #-12]
+	mov sp, fp
+	ldr fp, [sp]
+	add sp, sp, #4
+	mov pc, r1
 `,
 			0,
 		},
@@ -316,7 +326,7 @@ func TestMake(t *testing.T) {
 			"_label",
 			[]any{3},
 			`L0_label:  @OpGetLocal
-	add r0, sp, #12
+	sub r0, fp, #16
 	ldr r1, [r0]
 	push {r1}
 `,
@@ -326,8 +336,11 @@ func TestMake(t *testing.T) {
 			code.OpSetLocal,
 			0,
 			"_label",
-			[]any{},
+			[]any{2},
 			`L0_label:  @OpSetLocal
+	sub r0, fp, #12
+	pop {r1}
+	str r0, [r1]
 `,
 			0,
 		},
