@@ -13,6 +13,10 @@ Já que a linguagem implementada no livro se chama "monkey", o nome da linguagem
 - [ ] Talvez remover retornos implícitos;
   - [ ] Nesse caso, remover opcode de "pop".
 - [x] Remover implementação de hashes;
-- [ ] Criar built-in `gets`;
+- [ ] Criar built-ins `getc` e `putc`;
 - [x] Compilar arquivos;
-- [ ] Se sobrar tempo, implementar `while`.
+- [ ] Se sobrar tempo, implementar `while`;
+- [x] Retornar código de erro em erros de compilação;
+- [ ] Remover VM/REPL;
+- [ ] Escrever em arquivo ao invés de imprimir;
+- [ ] Fazer teste do arm_compiler.go (fibonacci e função separada).

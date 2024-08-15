@@ -15,13 +15,17 @@ import (
 )
 
 func main() {
-	args := args.NewArgs()
+	args, err := args.NewArgs()
+	if err != nil {
+		fmt.Fprint(os.Stderr, err)
+		os.Exit(1)
+	}
 
 	if args.Program != "" {
 		source, err := os.ReadFile(args.Program)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error when reading file: %s", err)
-			return
+			os.Exit(1)
 		}
 
 		constants := []object.Object{}
@@ -35,21 +39,21 @@ func main() {
 		program := p.ParseProgram()
 		if len(p.Errors()) != 0 {
 			printParserErrors(os.Stderr, p.Errors())
-			return
+			os.Exit(1)
 		}
 
 		comp := compiler.NewWithState(symbolTable, constants)
 		err = comp.Compile(program)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "compilation failed:\n %s\n", err)
-			return
+			os.Exit(1)
 		}
 
 		arm_compiler := arm.New(comp)
 		err = arm_compiler.Compile()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "compilation failed:\n %s\n", err)
-			return
+			os.Exit(1)
 		}
 
 		return
@@ -57,7 +61,8 @@ func main() {
 
 	user, err := user.Current()
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "user fetching failed:\n %s\n", err)
+		os.Exit(1)
 	}
 
 	fmt.Printf("Hello %s! This is the Marmoset programming language!\n",

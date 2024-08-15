@@ -19,7 +19,7 @@ type Args struct {
 	Program        string
 }
 
-func NewArgs() *Args {
+func NewArgs() (*Args, error) {
 	args := &Args{}
 
 	argsWithoutProg := os.Args[1:]
@@ -42,30 +42,41 @@ func NewArgs() *Args {
 				}
 			}
 
-			args.parseArg(arg, value)
+			err := args.parseArg(arg, value)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
-	return args
+	return args, nil
 }
 
-func (args *Args) parseArg(arg string, value string) {
+func (args *Args) parseArg(arg string, value string) error {
 	switch arg {
 	case VERBOSE, VERBOSE_V:
-		assertHasNoValue(arg, value)
+		err := assertHasNoValue(arg, value)
+		if err != nil {
+			return err
+		}
 		args.Verbose = true
 	case INTERPRET, INTERPRET_V:
-		assertHasNoValue(arg, value)
+		err := assertHasNoValue(arg, value)
+		if err != nil {
+			return err
+		}
 		args.UseInterpreter = true
 	default:
-		panic(fmt.Sprintf("unknown argument %s", arg))
+		return fmt.Errorf("unknown argument %s", arg)
 	}
+	return nil
 }
 
-func assertHasNoValue(arg string, value string) {
+func assertHasNoValue(arg string, value string) error {
 	if value != "" {
-		panic(fmt.Sprintf("arg %s does not expect a positional argument", arg))
+		return fmt.Errorf("arg %s does not expect a positional argument", arg)
 	}
+	return nil
 }
 
 // for future use
