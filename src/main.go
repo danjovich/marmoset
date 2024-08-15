@@ -20,7 +20,7 @@ func main() {
 	if args.Program != "" {
 		source, err := os.ReadFile(args.Program)
 		if err != nil {
-			fmt.Printf("error when reading file: %s", err)
+			fmt.Fprintf(os.Stderr, "error when reading file: %s", err)
 			return
 		}
 
@@ -34,21 +34,21 @@ func main() {
 		p := parser.New(l)
 		program := p.ParseProgram()
 		if len(p.Errors()) != 0 {
-			printParserErrors(os.Stdout, p.Errors())
+			printParserErrors(os.Stderr, p.Errors())
 			return
 		}
 
 		comp := compiler.NewWithState(symbolTable, constants)
 		err = comp.Compile(program)
 		if err != nil {
-			fmt.Printf("compilation failed:\n %s\n", err)
+			fmt.Fprintf(os.Stderr, "compilation failed:\n %s\n", err)
 			return
 		}
 
 		arm_compiler := arm.New(comp)
 		err = arm_compiler.Compile()
 		if err != nil {
-			fmt.Printf("compilation failed:\n %s\n", err)
+			fmt.Fprintf(os.Stderr, "compilation failed:\n %s\n", err)
 			return
 		}
 
