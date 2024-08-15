@@ -7,12 +7,11 @@ import (
 
 func TestMake(t *testing.T) {
 	tests := []struct {
-		op                      code.Opcode
-		index                   int
-		label                   string
-		args                    []any
-		expected                string
-		expectedPushesMinusPops int
+		op       code.Opcode
+		index    int
+		label    string
+		args     []any
+		expected string
 	}{
 		{
 			code.OpConstant,
@@ -23,7 +22,6 @@ func TestMake(t *testing.T) {
 	mov r0, #1
 	push {r0}
 `,
-			1,
 		},
 		{
 			code.OpConstant,
@@ -38,7 +36,6 @@ func TestMake(t *testing.T) {
 	mov r0, #50
 	push {r0}
 `,
-			3,
 		},
 		{
 			code.OpAdd,
@@ -50,7 +47,6 @@ func TestMake(t *testing.T) {
 	add r0, r2, r1
 	push {r0}
 `,
-			1,
 		},
 		{
 			code.OpSub,
@@ -62,7 +58,6 @@ func TestMake(t *testing.T) {
 	sub r0, r2, r1
 	push {r0}
 `,
-			1,
 		},
 		{
 			code.OpMul,
@@ -74,7 +69,6 @@ func TestMake(t *testing.T) {
 	mul r0, r2, r1
 	push {r0}
 `,
-			1,
 		},
 		{
 			code.OpDiv,
@@ -86,7 +80,6 @@ func TestMake(t *testing.T) {
 	bl __aeabi_idiv
 	push {r0}
 `,
-			1,
 		},
 		{
 			code.OpPop,
@@ -96,7 +89,6 @@ func TestMake(t *testing.T) {
 			`L0_label:  @OpPop
 	pop {r0}
 `,
-			0,
 		},
 		{
 			code.OpTrue,
@@ -107,7 +99,6 @@ func TestMake(t *testing.T) {
 	mov r0, #1
 	push {r0}
 `,
-			1,
 		},
 		{
 			code.OpFalse,
@@ -118,7 +109,6 @@ func TestMake(t *testing.T) {
 	mov r0, #0
 	push {r0}
 `,
-			1,
 		},
 		{
 			code.OpEqual,
@@ -132,7 +122,6 @@ func TestMake(t *testing.T) {
 	moveq r0, #1
 	push {r0}
 `,
-			1,
 		},
 		{
 			code.OpNotEqual,
@@ -146,7 +135,6 @@ func TestMake(t *testing.T) {
 	movneq r0, #1
 	push {r0}
 `,
-			1,
 		},
 		{
 			code.OpGreaterThan,
@@ -160,7 +148,6 @@ func TestMake(t *testing.T) {
 	movgt r0, #1
 	push {r0}
 `,
-			1,
 		},
 		{
 			code.OpMinus,
@@ -172,7 +159,6 @@ func TestMake(t *testing.T) {
 	sub r0, #0, r0
 	push {r0}
 `,
-			1,
 		},
 		{
 			code.OpBang,
@@ -186,7 +172,6 @@ func TestMake(t *testing.T) {
 	moveq r1, #1
 	push {r1}
 `,
-			1,
 		},
 		{
 			code.OpJumpNotTruthy,
@@ -198,7 +183,6 @@ func TestMake(t *testing.T) {
 	cmp r0, #0
 	beq L2
 `,
-			0,
 		},
 		{
 			code.OpJump,
@@ -208,7 +192,6 @@ func TestMake(t *testing.T) {
 			`L0_label:  @OpJump
 	b L2
 `,
-			0,
 		},
 		{
 			code.OpNull,
@@ -219,7 +202,6 @@ func TestMake(t *testing.T) {
 	mov r0, #0
 	push {r0}
 `,
-			1,
 		},
 		{
 			code.OpGetGlobal,
@@ -230,7 +212,6 @@ func TestMake(t *testing.T) {
 	ldr r0, #_global_var
 	push {r0}
 `,
-			1,
 		},
 		{
 			code.OpSetGlobal,
@@ -241,7 +222,6 @@ func TestMake(t *testing.T) {
 	pop {r0}
 	str r0, #_global_var
 `,
-			0,
 		},
 		{
 			code.OpArray,
@@ -254,7 +234,6 @@ func TestMake(t *testing.T) {
 	sub r0, sp, #4
 	push {r0}
 `,
-			2,
 		},
 		{
 			code.OpIndex,
@@ -270,7 +249,6 @@ func TestMake(t *testing.T) {
 	ldr r0, [sp, r2, lsl #2]
 	push {r0}
 `,
-			1,
 		},
 		{
 			code.OpCall,
@@ -286,7 +264,6 @@ func TestMake(t *testing.T) {
 	blx r0
 	push {r0}
 `,
-			1,
 		},
 		{
 			code.OpReturnValue,
@@ -302,7 +279,6 @@ func TestMake(t *testing.T) {
 	add sp, sp, #4
 	mov pc, r1
 `,
-			0,
 		},
 		{
 			code.OpReturn,
@@ -318,7 +294,6 @@ func TestMake(t *testing.T) {
 	add sp, sp, #4
 	mov pc, r1
 `,
-			0,
 		},
 		{
 			code.OpGetLocal,
@@ -330,7 +305,6 @@ func TestMake(t *testing.T) {
 	ldr r1, [r0]
 	push {r1}
 `,
-			1,
 		},
 		{
 			code.OpSetLocal,
@@ -342,7 +316,6 @@ func TestMake(t *testing.T) {
 	pop {r1}
 	str r0, [r1]
 `,
-			0,
 		},
 		{
 			code.OpGetBuiltin,
@@ -351,12 +324,11 @@ func TestMake(t *testing.T) {
 			[]any{},
 			`L0_label:  @OpGetBuiltin
 `,
-			0,
 		},
 	}
 
 	for _, test := range tests {
-		result, pushesMinusPops, err := Make(test.op, test.index, test.label, test.args...)
+		result, err := Make(test.op, test.index, test.label, test.args...)
 
 		if err != nil {
 			t.Errorf("Make errored: %s", err)
@@ -365,11 +337,6 @@ func TestMake(t *testing.T) {
 		if result != test.expected {
 			t.Errorf("generated assembler source is wrong.\nwant=\n\"%s\"\ngot=\n\"%s\"",
 				test.expected, result)
-		}
-
-		if pushesMinusPops != test.expectedPushesMinusPops {
-			t.Errorf("opcode %v: pushed - pops is wrong.want=%d, got=%d",
-				test.op, test.expectedPushesMinusPops, pushesMinusPops)
 		}
 	}
 }

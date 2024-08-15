@@ -5,66 +5,63 @@ import (
 	"marmoset/code"
 )
 
-// returns the AArch32 assembly instructions corresponding to the opcode, ip and operands given,
-// and also returns the amount of pushes - pops that the assembly
-func Make(op code.Opcode, index int, scopeName string, operands ...any) (string, int, error) {
+// returns the AArch32 assembly instructions corresponding to the opcode, ip, scope and operands given
+func Make(op code.Opcode, index int, scopeName string, operands ...any) (string, error) {
 	label := fmt.Sprintf("L%d%s", index, scopeName)
 	switch op {
 	case code.OpConstant:
 		if len(operands) < 1 {
-			return "", 0, fmt.Errorf("OpConstant should have at least one operand")
+			return "", fmt.Errorf("OpConstant should have at least one operand")
 		}
 		result := []byte(fmt.Sprintf(`%s:  @OpConstant
 `, label))
-		stackChanges := 0
 		for _, operand := range operands {
 			result = fmt.Appendf(result, `	mov r0, %s
 	push {r0}
 `, operand)
-			stackChanges++
 		}
-		return string(result), stackChanges, nil
+		return string(result), nil
 
 	case code.OpAdd, code.OpSub, code.OpMul, code.OpDiv:
 		if len(operands) != 0 {
-			return "", 0, fmt.Errorf("binary operations should not have any operands")
+			return "", fmt.Errorf("binary operations should not have any operands")
 		}
-		return makeBinaryOperation(op, label), 1, nil
+		return makeBinaryOperation(op, label), nil
 
 	case code.OpPop:
 		// TODO: pop of arrays (maybe an "array pointer", similar to stack pointer, or check previous instruction on compiler)
 		if len(operands) != 0 {
-			return "", 0, fmt.Errorf("OpPop should not have any operands")
+			return "", fmt.Errorf("OpPop should not have any operands")
 		}
 		return fmt.Sprintf(`%s:  @OpPop
 	pop {r0}
-`, label), 0, nil
+`, label), nil
 
 	case code.OpTrue, code.OpFalse:
 		if len(operands) != 0 {
-			return "", 0, fmt.Errorf("booleans should not have any operands")
+			return "", fmt.Errorf("booleans should not have any operands")
 		}
-		return makeBoolean(op == code.OpTrue, label), 1, nil
+		return makeBoolean(op == code.OpTrue, label), nil
 
 	case code.OpEqual, code.OpNotEqual, code.OpGreaterThan:
 		if len(operands) != 0 {
-			return "", 0, fmt.Errorf("comparisons should not have any operands")
+			return "", fmt.Errorf("comparisons should not have any operands")
 		}
-		return makeComparison(op, label), 1, nil
+		return makeComparison(op, label), nil
 
 	case code.OpMinus:
 		if len(operands) != 0 {
-			return "", 0, fmt.Errorf("OpMinus should not have any operands")
+			return "", fmt.Errorf("OpMinus should not have any operands")
 		}
 		return fmt.Sprintf(`%s:  @OpMinus
 	pop {r0}
 	sub r0, #0, r0
 	push {r0}
-`, label), 1, nil
+`, label), nil
 
 	case code.OpBang:
 		if len(operands) != 0 {
-			return "", 0, fmt.Errorf("OpBang should not have any operands")
+			return "", fmt.Errorf("OpBang should not have any operands")
 		}
 		return fmt.Sprintf(`%s:  @OpBang
 	mov r1, #0
@@ -72,60 +69,60 @@ func Make(op code.Opcode, index int, scopeName string, operands ...any) (string,
 	cmp r0, #0
 	moveq r1, #1
 	push {r1}
-`, label), 1, nil
+`, label), nil
 
 	case code.OpJumpNotTruthy:
 		if len(operands) != 1 {
-			return "", 0, fmt.Errorf("OpJumpNotTruthy should have only one operand")
+			return "", fmt.Errorf("OpJumpNotTruthy should have only one operand")
 		}
 		dest := operands[0]
 		return fmt.Sprintf(`%s:  @OpJumpNotTruthy
 	pop {r0}
 	cmp r0, #0
 	beq %s
-`, label, dest), 0, nil
+`, label, dest), nil
 
 	case code.OpJump:
 		if len(operands) != 1 {
-			return "", 0, fmt.Errorf("OpJump should have only one operand")
+			return "", fmt.Errorf("OpJump should have only one operand")
 		}
 		dest := operands[0]
 		return fmt.Sprintf(`%s:  @OpJump
 	b %s
-`, label, dest), 0, nil
+`, label, dest), nil
 
 	case code.OpNull:
 		if len(operands) != 0 {
-			return "", 0, fmt.Errorf("OpNull should not have any operands")
+			return "", fmt.Errorf("OpNull should not have any operands")
 		}
 		return fmt.Sprintf(`%s:  @OpNull
 	mov r0, #0
 	push {r0}
-`, label), 1, nil
+`, label), nil
 
 	case code.OpGetGlobal:
 		if len(operands) != 1 {
-			return "", 0, fmt.Errorf("OpGetGlobal should have only one operand")
+			return "", fmt.Errorf("OpGetGlobal should have only one operand")
 		}
 		name := operands[0]
 		return fmt.Sprintf(`%s:  @OpGetGlobal
 	ldr r0, #_%s
 	push {r0}
-`, label, name), 1, nil
+`, label, name), nil
 
 	case code.OpSetGlobal:
 		if len(operands) != 1 {
-			return "", 0, fmt.Errorf("OpSetGlobal should have only one operand")
+			return "", fmt.Errorf("OpSetGlobal should have only one operand")
 		}
 		name := operands[0]
 		return fmt.Sprintf(`%s:  @OpSetGlobal
 	pop {r0}
 	str r0, #_%s
-`, label, name), 0, nil
+`, label, name), nil
 
 	case code.OpArray:
 		if len(operands) != 1 {
-			return "", 0, fmt.Errorf("OpArray should have only one operand")
+			return "", fmt.Errorf("OpArray should have only one operand")
 		}
 		length := operands[0]
 		// arrays must push their length and memory location
@@ -134,11 +131,11 @@ func Make(op code.Opcode, index int, scopeName string, operands ...any) (string,
 	push {r0}
 	sub r0, sp, #4
 	push {r0}
-`, label, length), 2, nil
+`, label, length), nil
 
 	case code.OpIndex:
 		if len(operands) != 0 {
-			return "", 0, fmt.Errorf("OpIndex should not have any operands")
+			return "", fmt.Errorf("OpIndex should not have any operands")
 		}
 		// r3 = location of array
 		// r0 = index, r1 = length
@@ -153,15 +150,15 @@ func Make(op code.Opcode, index int, scopeName string, operands ...any) (string,
 	sub r2, r2, #1
 	ldr r0, [sp, r2, lsl #2]
 	push {r0}
-`, label), 1, nil
+`, label), nil
 
 	case code.OpCall:
 		if len(operands) != 1 {
-			return "", 0, fmt.Errorf("OpCall should have only one operand")
+			return "", fmt.Errorf("OpCall should have only one operand")
 		}
 		numArgs, ok := operands[0].(int)
 		if !ok {
-			return "", 0, fmt.Errorf("OpCall argument should be an integer")
+			return "", fmt.Errorf("OpCall argument should be an integer")
 		}
 		// should jump to the function memory position (on stack before arguments), set the fp
 		// and push the returned value (on r0), storing fp and lr for the future
@@ -173,16 +170,16 @@ func Make(op code.Opcode, index int, scopeName string, operands ...any) (string,
 	mov fp, sp
 	blx r0
 	push {r0}
-`, label, (numArgs+1)*4), 1, nil
+`, label, (numArgs+1)*4), nil
 
 	case code.OpReturnValue:
 		if len(operands) != 1 {
-			return "", 0, fmt.Errorf("OpReturnValue should only one operand")
+			return "", fmt.Errorf("OpReturnValue should only one operand")
 		}
 		// old lr to be restored from memory
 		lrIndex, ok := operands[0].(int)
 		if !ok {
-			return "", 0, fmt.Errorf("OpReturnValue argument should be an integer")
+			return "", fmt.Errorf("OpReturnValue argument should be an integer")
 		}
 		return fmt.Sprintf(`%s:  @OpReturnValue
 	pop {r0}
@@ -192,16 +189,16 @@ func Make(op code.Opcode, index int, scopeName string, operands ...any) (string,
 	ldr fp, [sp]
 	add sp, sp, #4
 	mov pc, r1
-`, label, lrIndex*4), 0, nil
+`, label, lrIndex*4), nil
 
 	case code.OpReturn:
 		if len(operands) != 1 {
-			return "", 0, fmt.Errorf("OpReturn should have only one operands")
+			return "", fmt.Errorf("OpReturn should have only one operands")
 		}
 		// old lr to be restored from memory
 		lrIndex, ok := operands[0].(int)
 		if !ok {
-			return "", 0, fmt.Errorf("OpReturn argument should be an integer")
+			return "", fmt.Errorf("OpReturn argument should be an integer")
 		}
 		// empty returns return null!
 		return fmt.Sprintf(`%s:  @OpReturn
@@ -212,48 +209,48 @@ func Make(op code.Opcode, index int, scopeName string, operands ...any) (string,
 	ldr fp, [sp]
 	add sp, sp, #4
 	mov pc, r1
-`, label, lrIndex*4), 0, nil
+`, label, lrIndex*4), nil
 
 	case code.OpGetLocal:
 		if len(operands) != 1 {
-			return "", 0, fmt.Errorf("OpGetLocal should have only one operand")
+			return "", fmt.Errorf("OpGetLocal should have only one operand")
 		}
 		localIndex, ok := operands[0].(int)
 		if !ok {
-			return "", 0, fmt.Errorf("OpGetLocal first argument should be an integer")
+			return "", fmt.Errorf("OpGetLocal first argument should be an integer")
 		}
 		// (localIndex+1)*4 because the fp points to the previous sp
 		return fmt.Sprintf(`%s:  @OpGetLocal
 	sub r0, fp, #%d
 	ldr r1, [r0]
 	push {r1}
-`, label, (localIndex+1)*4), 1, nil
+`, label, (localIndex+1)*4), nil
 
 	case code.OpSetLocal:
 		if len(operands) != 1 {
-			return "", 0, fmt.Errorf("OpSetLocal should have only one operands")
+			return "", fmt.Errorf("OpSetLocal should have only one operands")
 		}
 		localIndex, ok := operands[0].(int)
 		if !ok {
-			return "", 0, fmt.Errorf("OpSetLocal first argument should be an integer")
+			return "", fmt.Errorf("OpSetLocal first argument should be an integer")
 		}
 		// (localIndex+1)*4 because the fp points to the previous sp
 		return fmt.Sprintf(`%s:  @OpSetLocal
 	sub r0, fp, #%d
 	pop {r1}
 	str r0, [r1]
-`, label, (localIndex+1)*4), 0, nil
+`, label, (localIndex+1)*4), nil
 
 	case code.OpGetBuiltin:
 		// TODO: implement builtins get and call
 		if len(operands) != 0 {
-			return "", 0, fmt.Errorf("OpGetBuiltin should not have any operands")
+			return "", fmt.Errorf("OpGetBuiltin should not have any operands")
 		}
 		return fmt.Sprintf(`%s:  @OpGetBuiltin
-`, label), 0, nil
+`, label), nil
 	}
 
-	return "", 0, fmt.Errorf("unknown operator: %d", op)
+	return "", fmt.Errorf("unknown operator: %d", op)
 }
 
 func makeBinaryOperation(op code.Opcode, label string) string {

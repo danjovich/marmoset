@@ -133,7 +133,7 @@ func compileFromInstructionsAndSymbols(scope compiler.CompilationScope, constant
 			args = append(args, startOfTheStack)
 		}
 
-		asm, _, err := arm.Make(op, index, scopeName, args...)
+		asm, err := arm.Make(op, index, scopeName, args...)
 		if err != nil {
 			return err
 		}
