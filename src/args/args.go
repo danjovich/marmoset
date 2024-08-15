@@ -67,7 +67,7 @@ func (args *Args) parseArg(arg string, value string) error {
 		}
 		args.UseInterpreter = true
 	default:
-		return fmt.Errorf("unknown argument %s", arg)
+		return fmt.Errorf("unknown argument: %s", arg)
 	}
 	return nil
 }

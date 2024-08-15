@@ -17,14 +17,14 @@ import (
 func main() {
 	args, err := args.NewArgs()
 	if err != nil {
-		fmt.Fprint(os.Stderr, err)
+		fmt.Fprintf(os.Stderr, "%s\n", err)
 		os.Exit(1)
 	}
 
 	if args.Program != "" {
 		source, err := os.ReadFile(args.Program)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "error when reading file: %s", err)
+			fmt.Fprintf(os.Stderr, "error when reading file: %s\n", err)
 			os.Exit(1)
 		}
 
