@@ -38,11 +38,10 @@ func New() *Compiler {
 		Instructions:        code.Instructions{},
 		lastInstruction:     EmittedInstruction{},
 		previousInstruction: EmittedInstruction{},
-		Name: `.global _start
-_start`,
-		IsMain:      true,
-		Args:        []string{},
-		SymbolTable: symbolTable,
+		Name:                "_start",
+		IsMain:              true,
+		Args:                []string{},
+		SymbolTable:         symbolTable,
 	}
 
 	for i, v := range object.Builtins {

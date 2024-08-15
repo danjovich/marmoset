@@ -17,7 +17,7 @@ func TestMake(t *testing.T) {
 			code.OpConstant,
 			0,
 			"_label",
-			[]any{"#1"},
+			[]any{"mov r0, #1"},
 			`L0_label:  @OpConstant
 	mov r0, #1
 	push {r0}
@@ -27,7 +27,7 @@ func TestMake(t *testing.T) {
 			code.OpConstant,
 			0,
 			"_label",
-			[]any{"#1", "#2", "#50"},
+			[]any{"mov r0, #1", "mov r0, #2", "mov r0, #50"},
 			`L0_label:  @OpConstant
 	mov r0, #1
 	push {r0}
@@ -209,8 +209,9 @@ func TestMake(t *testing.T) {
 			"_label",
 			[]any{"global_var"},
 			`L0_label:  @OpGetGlobal
-	ldr r0, #_global_var
-	push {r0}
+	ldr r0, =_global_var
+	ldr r1, [r0]
+	push {r1}
 `,
 		},
 		{
@@ -220,7 +221,8 @@ func TestMake(t *testing.T) {
 			[]any{"global_var"},
 			`L0_label:  @OpSetGlobal
 	pop {r0}
-	str r0, #_global_var
+	ldr r1, =_global_var
+	str r0, [r1]
 `,
 		},
 		{
@@ -261,7 +263,9 @@ func TestMake(t *testing.T) {
 	ldr r0, [sp]
 	str fp, [sp]
 	mov fp, sp
-	blx r0
+	add r1, pc, #4
+	mov lr, r1
+	mov pc, r0
 	push {r0}
 `,
 		},

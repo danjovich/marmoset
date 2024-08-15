@@ -16,7 +16,7 @@ func Make(op code.Opcode, index int, scopeName string, operands ...any) (string,
 		result := []byte(fmt.Sprintf(`%s:  @OpConstant
 `, label))
 		for _, operand := range operands {
-			result = fmt.Appendf(result, `	mov r0, %s
+			result = fmt.Appendf(result, `	%s
 	push {r0}
 `, operand)
 		}
@@ -106,8 +106,9 @@ func Make(op code.Opcode, index int, scopeName string, operands ...any) (string,
 		}
 		name := operands[0]
 		return fmt.Sprintf(`%s:  @OpGetGlobal
-	ldr r0, #_%s
-	push {r0}
+	ldr r0, =_%s
+	ldr r1, [r0]
+	push {r1}
 `, label, name), nil
 
 	case code.OpSetGlobal:
@@ -117,7 +118,8 @@ func Make(op code.Opcode, index int, scopeName string, operands ...any) (string,
 		name := operands[0]
 		return fmt.Sprintf(`%s:  @OpSetGlobal
 	pop {r0}
-	str r0, #_%s
+	ldr r1, =_%s
+	str r0, [r1]
 `, label, name), nil
 
 	case code.OpArray:
@@ -162,13 +164,17 @@ func Make(op code.Opcode, index int, scopeName string, operands ...any) (string,
 		}
 		// should jump to the function memory position (on stack before arguments), set the fp
 		// and push the returned value (on r0), storing fp and lr for the future
+		// the `add r1, pc, #4` is not #12 because to the pc being advanced two positions due
+		// to pipelined execution
 		return fmt.Sprintf(`%s:  @OpCall
 	push {lr}
 	add sp, sp, #%d
 	ldr r0, [sp]
 	str fp, [sp]
 	mov fp, sp
-	blx r0
+	add r1, pc, #4
+	mov lr, r1
+	mov pc, r0
 	push {r0}
 `, label, (numArgs+1)*4), nil
 

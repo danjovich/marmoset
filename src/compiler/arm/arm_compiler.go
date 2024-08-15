@@ -21,15 +21,16 @@ func New(compiler *compiler.Compiler) *ArmCompiler {
 }
 
 func (ac *ArmCompiler) Compile() error {
-	// TODO: use arm-linux-gnueabihf-as?
-
 	constants := ac.compiler.Constants
 	globalFunctions := []string{}
 
 	for _, scope := range ac.compiler.AllScopes {
-		fmt.Printf("%s:\n", scope.Name)
 		if scope.IsMain {
-			fmt.Print("	mov sp, #0x4000\n	mov fp, sp\n\n")
+			fmt.Println(`.global _start
+.text
+_start:`)
+		} else {
+			fmt.Printf("%s:\n", scope.Name)
 		}
 
 		globalFunctions = append(globalFunctions, scope.Name)
@@ -40,7 +41,11 @@ func (ac *ArmCompiler) Compile() error {
 		}
 
 		if scope.IsMain {
-			fmt.Print("_end: b _end\n\n")
+			// prints an exit(0) syscall
+			fmt.Printf(`_end: 
+	mov r0, #0 
+	mov r7, #1 
+	svc #0%s`, "\n\n")
 		}
 	}
 
@@ -148,11 +153,11 @@ func compileFromInstructionsAndSymbols(scope compiler.CompilationScope, constant
 func generateConstantArgs(constant object.Object) ([]interface{}, error) {
 	switch constant := constant.(type) {
 	case *object.CompiledFunction:
-		result := fmt.Sprintf("#%s", constant.Name)
+		result := fmt.Sprintf("ldr r0, =%s", constant.Name)
 		return []interface{}{result}, nil
 
 	case *object.Integer:
-		result := fmt.Sprintf("#%d", constant.Value)
+		result := fmt.Sprintf("mov r0, #%d", constant.Value)
 		return []interface{}{result}, nil
 
 	case *object.String:
@@ -163,7 +168,7 @@ func generateConstantArgs(constant object.Object) ([]interface{}, error) {
 		result := []interface{}{}
 		for asciiValues != 0 {
 			asciiValue := asciiValues % 0xFF
-			result = append(result, fmt.Sprintf("#%d", asciiValue))
+			result = append(result, fmt.Sprintf("mov r0, #%d", asciiValue))
 			asciiValues <<= 8
 		}
 		return result, nil
