@@ -81,7 +81,7 @@ L5_sub:  @OpReturnValue
 	add sp, sp, #4
 	mov pc, r1
 
+_c: .word 0x0
+_sub: .word sub
 _a: .word 0x0
 _b: .word 0x0
-_sub: .word sub
-_c: .word 0x0
