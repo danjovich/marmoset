@@ -1,19 +1,19 @@
 .global _start
+.text
 _start:
-	mov sp, #0x4000
-	mov fp, sp
-
 L0:  @OpConstant
-	mov r0, #fibonacci
+	ldr r0, =fibonacci
 	push {r0}
 
 L3:  @OpSetGlobal
 	pop {r0}
-	str r0, #_fibonacci
+	ldr r1, =_fibonacci
+	str r0, [r1]
 
 L6:  @OpGetGlobal
-	ldr r0, #_fibonacci
-	push {r0}
+	ldr r0, =_fibonacci
+	ldr r1, [r0]
+	push {r1}
 
 L9:  @OpConstant
 	mov r0, #15
@@ -25,13 +25,18 @@ L12:  @OpCall
 	ldr r0, [sp]
 	str fp, [sp]
 	mov fp, sp
-	blx r0
+	add r1, pc, #4
+	mov lr, r1
+	mov pc, r0
 	push {r0}
 
 L14:  @OpPop
 	pop {r0}
 
-_end: b _end
+_end: 
+	mov r0, #0 
+	mov r7, #1 
+	svc #0
 
 fibonacci:
 	sub sp, sp, #8
@@ -111,8 +116,9 @@ L29_fibonacci:  @OpJump
 	b L56_fibonacci
 
 L32_fibonacci:  @OpGetGlobal
-	ldr r0, #_fibonacci
-	push {r0}
+	ldr r0, =_fibonacci
+	ldr r1, [r0]
+	push {r1}
 
 L35_fibonacci:  @OpGetLocal
 	sub r0, fp, #4
@@ -134,12 +140,15 @@ L41_fibonacci:  @OpCall
 	ldr r0, [sp]
 	str fp, [sp]
 	mov fp, sp
-	blx r0
+	add r1, pc, #4
+	mov lr, r1
+	mov pc, r0
 	push {r0}
 
 L43_fibonacci:  @OpGetGlobal
-	ldr r0, #_fibonacci
-	push {r0}
+	ldr r0, =_fibonacci
+	ldr r1, [r0]
+	push {r1}
 
 L46_fibonacci:  @OpGetLocal
 	sub r0, fp, #4
@@ -161,7 +170,9 @@ L52_fibonacci:  @OpCall
 	ldr r0, [sp]
 	str fp, [sp]
 	mov fp, sp
-	blx r0
+	add r1, pc, #4
+	mov lr, r1
+	mov pc, r0
 	push {r0}
 
 L54_fibonacci:  @OpAdd

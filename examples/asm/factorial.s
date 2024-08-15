@@ -1,19 +1,19 @@
 .global _start
+.text
 _start:
-	mov sp, #0x4000
-	mov fp, sp
-
 L0:  @OpConstant
-	mov r0, #factorial
+	ldr r0, =factorial
 	push {r0}
 
 L3:  @OpSetGlobal
 	pop {r0}
-	str r0, #_factorial
+	ldr r1, =_factorial
+	str r0, [r1]
 
 L6:  @OpGetGlobal
-	ldr r0, #_factorial
-	push {r0}
+	ldr r0, =_factorial
+	ldr r1, [r0]
+	push {r1}
 
 L9:  @OpConstant
 	mov r0, #10
@@ -25,13 +25,18 @@ L12:  @OpCall
 	ldr r0, [sp]
 	str fp, [sp]
 	mov fp, sp
-	blx r0
+	add r1, pc, #4
+	mov lr, r1
+	mov pc, r0
 	push {r0}
 
 L14:  @OpPop
 	pop {r0}
 
-_end: b _end
+_end: 
+	mov r0, #0 
+	mov r7, #1 
+	svc #0
 
 factorial:
 	sub sp, sp, #8
@@ -81,8 +86,9 @@ L17_factorial:  @OpPop
 	pop {r0}
 
 L18_factorial:  @OpGetGlobal
-	ldr r0, #_factorial
-	push {r0}
+	ldr r0, =_factorial
+	ldr r1, [r0]
+	push {r1}
 
 L21_factorial:  @OpGetLocal
 	sub r0, fp, #4
@@ -104,7 +110,9 @@ L27_factorial:  @OpCall
 	ldr r0, [sp]
 	str fp, [sp]
 	mov fp, sp
-	blx r0
+	add r1, pc, #4
+	mov lr, r1
+	mov pc, r0
 	push {r0}
 
 L29_factorial:  @OpGetLocal

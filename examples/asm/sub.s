@@ -1,15 +1,14 @@
 .global _start
+.text
 _start:
-	mov sp, #0x4000
-	mov fp, sp
-
 L0:  @OpConstant
 	mov r0, #52
 	push {r0}
 
 L3:  @OpSetGlobal
 	pop {r0}
-	str r0, #_a
+	ldr r1, =_a
+	str r0, [r1]
 
 L6:  @OpConstant
 	mov r0, #34
@@ -17,27 +16,32 @@ L6:  @OpConstant
 
 L9:  @OpSetGlobal
 	pop {r0}
-	str r0, #_b
+	ldr r1, =_b
+	str r0, [r1]
 
 L12:  @OpConstant
-	mov r0, #sub
+	ldr r0, =sub
 	push {r0}
 
 L15:  @OpSetGlobal
 	pop {r0}
-	str r0, #_sub
+	ldr r1, =_sub
+	str r0, [r1]
 
 L18:  @OpGetGlobal
-	ldr r0, #_sub
-	push {r0}
+	ldr r0, =_sub
+	ldr r1, [r0]
+	push {r1}
 
 L21:  @OpGetGlobal
-	ldr r0, #_a
-	push {r0}
+	ldr r0, =_a
+	ldr r1, [r0]
+	push {r1}
 
 L24:  @OpGetGlobal
-	ldr r0, #_b
-	push {r0}
+	ldr r0, =_b
+	ldr r1, [r0]
+	push {r1}
 
 L27:  @OpCall
 	push {lr}
@@ -45,14 +49,20 @@ L27:  @OpCall
 	ldr r0, [sp]
 	str fp, [sp]
 	mov fp, sp
-	blx r0
+	add r1, pc, #4
+	mov lr, r1
+	mov pc, r0
 	push {r0}
 
 L29:  @OpSetGlobal
 	pop {r0}
-	str r0, #_c
+	ldr r1, =_c
+	str r0, [r1]
 
-_end: b _end
+_end: 
+	mov r0, #0 
+	mov r7, #1 
+	svc #0
 
 sub:
 	sub sp, sp, #12
@@ -81,7 +91,7 @@ L5_sub:  @OpReturnValue
 	add sp, sp, #4
 	mov pc, r1
 
-_c: .word 0x0
 _sub: .word sub
 _a: .word 0x0
 _b: .word 0x0
+_c: .word 0x0
