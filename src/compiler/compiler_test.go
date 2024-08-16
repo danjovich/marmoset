@@ -863,11 +863,11 @@ push([], 1);
 `,
 			expectedConstants: []interface{}{1},
 			expectedInstructions: []code.Instructions{
-				code.Make(code.OpGetBuiltin, 2),
+				code.Make(code.OpGetBuiltin, 4),
 				code.Make(code.OpArray, 0),
 				code.Make(code.OpCall, 1),
 				code.Make(code.OpPop),
-				code.Make(code.OpGetBuiltin, 6),
+				code.Make(code.OpGetBuiltin, 8),
 				code.Make(code.OpArray, 0),
 				code.Make(code.OpConstant, 0),
 				code.Make(code.OpCall, 2),
@@ -878,7 +878,7 @@ push([], 1);
 			input: `fn func(){ len([]) }`,
 			expectedConstants: []interface{}{
 				[]code.Instructions{
-					code.Make(code.OpGetBuiltin, 2),
+					code.Make(code.OpGetBuiltin, 4),
 					code.Make(code.OpArray, 0),
 					code.Make(code.OpCall, 1),
 					code.Make(code.OpReturnValue),
