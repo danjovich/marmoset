@@ -36,5 +36,8 @@ gdb-% : examples/bin/%.out
 		-ex 'target remote localhost:1234' \
 		-ex 'layout split' \
 		-ex 'layout regs'
+
+run-% : examples/bin/%.out
+	./$?
 	
 
