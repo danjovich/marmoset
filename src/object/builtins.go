@@ -1,6 +1,10 @@
 package object
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"os"
+)
 
 var Builtins = []struct {
 	Name    string
@@ -12,6 +16,15 @@ var Builtins = []struct {
 			Fn: func(args ...Object) Object {
 				fmt.Print(args[0].Inspect())
 				return nil
+			},
+		},
+	},
+	{"get",
+		&Builtin{
+			Fn: func(args ...Object) Object {
+				reader := bufio.NewReader(os.Stdin)
+				input, _ := reader.ReadString('\n')
+				return &String{Value: input}
 			},
 		},
 	},
