@@ -14,7 +14,7 @@ fn add(x: int, y: int): int {
 };
 
 let result = add(five, ten);
-!-/*5;
+!-/*%5;
 5 < 10 > 5;
 
 if (5 < 10) {
@@ -84,6 +84,7 @@ let var = true;
 		{token.MINUS, "-"},
 		{token.SLASH, "/"},
 		{token.ASTERISK, "*"},
+		{token.PERCENT, "%"},
 		{token.INT_LIT, "5"},
 		{token.SEMICOLON, ";"},
 		{token.INT_LIT, "5"},

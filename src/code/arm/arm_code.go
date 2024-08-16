@@ -22,7 +22,7 @@ func Make(op code.Opcode, index int, scopeName string, operands ...any) (string,
 		}
 		return string(result), nil
 
-	case code.OpAdd, code.OpSub, code.OpMul, code.OpDiv:
+	case code.OpAdd, code.OpSub, code.OpMul, code.OpDiv, code.OpRest:
 		if len(operands) != 0 {
 			return "", fmt.Errorf("binary operations should not have any operands")
 		}
@@ -55,7 +55,8 @@ func Make(op code.Opcode, index int, scopeName string, operands ...any) (string,
 		}
 		return fmt.Sprintf(`%s:  @OpMinus
 	pop {r0}
-	sub r0, #0, r0
+	mov r1, #0
+	sub r0, r1, r0
 	push {r0}
 `, label), nil
 
@@ -244,7 +245,7 @@ func Make(op code.Opcode, index int, scopeName string, operands ...any) (string,
 		return fmt.Sprintf(`%s:  @OpSetLocal
 	sub r0, fp, #%d
 	pop {r1}
-	str r0, [r1]
+	str r1, [r0]
 `, label, (localIndex+1)*4), nil
 
 	case code.OpGetBuiltin:
@@ -276,9 +277,10 @@ func makeBinaryOperation(op code.Opcode, label string) string {
 	case code.OpMul:
 		return fmt.Sprintf(format, label, "Mul", "mul r0, r2, r1")
 	case code.OpDiv:
-		// TODO: check if args order is right
-		// calls ABI integer division routine
-		return fmt.Sprintf(format, label, "Div", "bl __aeabi_idiv")
+		return fmt.Sprintf(format, label, "Div", "sdiv r0, r2, r1")
+	case code.OpRest:
+		return fmt.Sprintf(format, label, "Rest", `udiv r0, r2, r1
+	mls r0, r0, r1, r2`)
 	}
 
 	return ""
@@ -301,7 +303,7 @@ func makeComparison(op code.Opcode, label string) string {
 	format := `%s:  @Op%s
 	mov r0, #0
 	pop {r1, r2}
-	cmp r1, r2
+	cmp r2, r1
 	mov%s r0, #1
 	push {r0}
 `
@@ -310,7 +312,7 @@ func makeComparison(op code.Opcode, label string) string {
 	case code.OpEqual:
 		return fmt.Sprintf(format, label, "Equal", "eq")
 	case code.OpNotEqual:
-		return fmt.Sprintf(format, label, "NotEqual", "neq")
+		return fmt.Sprintf(format, label, "NotEqual", "ne")
 	case code.OpGreaterThan:
 		return fmt.Sprintf(format, label, "GreaterThan", "gt")
 	}

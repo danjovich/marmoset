@@ -18,6 +18,7 @@ const (
 	OpSub
 	OpMul
 	OpDiv
+	OpRest
 	// pops top of the stack
 	OpPop
 	// pushes booleans
@@ -69,6 +70,7 @@ var definitions = map[Opcode]*Definition{
 	OpSub:           {"OpSub", []int{}},
 	OpMul:           {"OpMul", []int{}},
 	OpDiv:           {"OpDiv", []int{}},
+	OpRest:          {"OpRest", []int{}},
 	OpPop:           {"OpPop", []int{}},
 	OpTrue:          {"OpTrue", []int{}},
 	OpFalse:         {"OpFalse", []int{}},

@@ -77,7 +77,19 @@ func TestMake(t *testing.T) {
 			[]any{},
 			`L0_label:  @OpDiv
 	pop {r1, r2}
-	bl __aeabi_idiv
+	sdiv r0, r2, r1
+	push {r0}
+`,
+		},
+		{
+			code.OpRest,
+			0,
+			"_label",
+			[]any{},
+			`L0_label:  @OpRest
+	pop {r1, r2}
+	udiv r0, r2, r1
+	mls r0, r0, r1, r2
 	push {r0}
 `,
 		},
@@ -118,7 +130,7 @@ func TestMake(t *testing.T) {
 			`L0_label:  @OpEqual
 	mov r0, #0
 	pop {r1, r2}
-	cmp r1, r2
+	cmp r2, r1
 	moveq r0, #1
 	push {r0}
 `,
@@ -131,8 +143,8 @@ func TestMake(t *testing.T) {
 			`L0_label:  @OpNotEqual
 	mov r0, #0
 	pop {r1, r2}
-	cmp r1, r2
-	movneq r0, #1
+	cmp r2, r1
+	movne r0, #1
 	push {r0}
 `,
 		},
@@ -144,7 +156,7 @@ func TestMake(t *testing.T) {
 			`L0_label:  @OpGreaterThan
 	mov r0, #0
 	pop {r1, r2}
-	cmp r1, r2
+	cmp r2, r1
 	movgt r0, #1
 	push {r0}
 `,
@@ -156,7 +168,8 @@ func TestMake(t *testing.T) {
 			[]any{},
 			`L0_label:  @OpMinus
 	pop {r0}
-	sub r0, #0, r0
+	mov r1, #0
+	sub r0, r1, r0
 	push {r0}
 `,
 		},
@@ -318,7 +331,7 @@ func TestMake(t *testing.T) {
 			`L0_label:  @OpSetLocal
 	sub r0, fp, #12
 	pop {r1}
-	str r0, [r1]
+	str r1, [r0]
 `,
 		},
 		{

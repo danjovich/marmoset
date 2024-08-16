@@ -144,6 +144,9 @@ func (ac *ArmCompiler) compileFromInstructionsAndSymbols(scope compiler.Compilat
 			}
 			// a builtin was used and must be in the compiled result
 			ac.usedBuiltins[int(builtinIndex)] = true
+			for _, usedBuiltin := range Builtins[builtinIndex].UsedBuiltins {
+				ac.usedBuiltins[GetBuiltinIndex(usedBuiltin)] = true
+			}
 			args = append(args, builtinName)
 
 		case code.OpReturn, code.OpReturnValue:

@@ -28,6 +28,14 @@ var Builtins = []struct {
 			},
 		},
 	},
+	{"putint",
+		&Builtin{
+			Fn: func(args ...Object) Object {
+				fmt.Print(args[0])
+				return nil
+			},
+		},
+	},
 	{
 		// length of array or string
 		"len",
