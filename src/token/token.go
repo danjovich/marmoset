@@ -20,12 +20,6 @@ const (
 	STRING_LIT = "STRING_LIT"
 	CHAR_LIT   = "CHAR_LIT"
 
-	// Types
-	INT  = "INT"
-	CHAR = "CHAR"
-	VOID = "VOID"
-	BOOL = "BOOL"
-
 	// Operators
 	ASSIGN   = "="
 	PLUS     = "+"
@@ -55,7 +49,6 @@ const (
 	RBRACKET = "]"
 
 	// Keywords
-	// TODO: Remove let and function
 	FUNCTION = "FUNCTION"
 	LET      = "LET"
 	TRUE     = "TRUE"
@@ -73,11 +66,6 @@ var keywords = map[string]TokenType{
 	"if":     IF,
 	"else":   ELSE,
 	"return": RETURN,
-	// types
-	"int":  INT,
-	"char": CHAR,
-	"void": VOID,
-	"bool": BOOL,
 }
 
 func LookupIdent(ident string) TokenType {

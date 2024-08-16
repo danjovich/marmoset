@@ -2,7 +2,7 @@ fn factorial(n) {
   if (n == 0) {
     return 1
   }
-  return factorial(n - 1) * n
+  return factorial(n - 1) * n // n! = (n - 1)! * n
 }
 
 putintln(factorial(10));

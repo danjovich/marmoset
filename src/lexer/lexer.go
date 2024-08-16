@@ -58,7 +58,13 @@ func (l *Lexer) NextToken() token.Token {
 	case '*':
 		tok = newToken(token.ASTERISK, l.ch)
 	case '/':
-		tok = newToken(token.SLASH, l.ch)
+		if l.peekChar() == '/' {
+			// ignore comments until \n
+			l.skipComment()
+			tok = l.NextToken()
+		} else {
+			tok = newToken(token.SLASH, l.ch)
+		}
 	case '%':
 		tok = newToken(token.PERCENT, l.ch)
 	case '<':
@@ -127,6 +133,12 @@ func isLetter(ch byte) bool {
 
 func (l *Lexer) skipWhitespace() {
 	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
+		l.readChar()
+	}
+}
+
+func (l *Lexer) skipComment() {
+	for l.peekChar() != '\n' {
 		l.readChar()
 	}
 }

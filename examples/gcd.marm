@@ -1,0 +1,11 @@
+// Greatest Common Divisor -> Máximo Divisor Comum
+fn gcd(a, b) {  
+  if (b == 0) {
+    a
+  } else {
+    gcd(b, a % b)
+  }
+};
+
+
+putintln(gcd(500, 120));
