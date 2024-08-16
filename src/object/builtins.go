@@ -6,6 +6,15 @@ var Builtins = []struct {
 	Name    string
 	Builtin *Builtin
 }{
+	// print char to STDOUT
+	{"put",
+		&Builtin{
+			Fn: func(args ...Object) Object {
+				fmt.Print(args[0].Inspect())
+				return nil
+			},
+		},
+	},
 	{
 		// length of array or string
 		"len",

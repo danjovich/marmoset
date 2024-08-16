@@ -249,11 +249,13 @@ func Make(op code.Opcode, index int, scopeName string, operands ...any) (string,
 
 	case code.OpGetBuiltin:
 		// TODO: implement builtins get and call
-		if len(operands) != 0 {
-			return "", fmt.Errorf("OpGetBuiltin should not have any operands")
+		if len(operands) != 1 {
+			return "", fmt.Errorf("OpGetBuiltin should have only one operand")
 		}
 		return fmt.Sprintf(`%s:  @OpGetBuiltin
-`, label), nil
+	ldr r0, =%s
+	push {r0}
+`, label, operands[0]), nil
 	}
 
 	return "", fmt.Errorf("unknown operator: %d", op)
@@ -314,4 +316,9 @@ func makeComparison(op code.Opcode, label string) string {
 	}
 
 	return ""
+}
+
+func MakeFunctionPreamble(numOfLocals int) string {
+	return fmt.Sprintf("	sub sp, sp, #%d\n", numOfLocals)
+
 }

@@ -68,6 +68,9 @@ func (s *SymbolTable) Resolve(name string) (Symbol, bool) {
 func (s *SymbolTable) ResolveName(index int, scope SymbolScope) (string, bool) {
 	switch scope {
 	case BuiltinScope:
+		if s.Outer != nil {
+			return s.Outer.ResolveName(index, scope)
+		}
 		return utils.At(s.reverseBuiltinStore, index)
 	case GlobalScope:
 		if s.Outer != nil {

@@ -11,12 +11,16 @@ import (
 )
 
 type ArmCompiler struct {
-	compiler *compiler.Compiler
+	compiler     *compiler.Compiler // internal representation compiler
+	usedBuiltins builtinSet         // builtins used by the code
 }
+
+type builtinSet map[int]bool
 
 func New(compiler *compiler.Compiler) *ArmCompiler {
 	return &ArmCompiler{
-		compiler: compiler,
+		usedBuiltins: make(builtinSet),
+		compiler:     compiler,
 	}
 }
 
@@ -35,7 +39,7 @@ _start:`)
 
 		globalFunctions = append(globalFunctions, scope.Name)
 
-		err := compileFromInstructionsAndSymbols(*scope, constants)
+		err := ac.compileFromInstructionsAndSymbols(*scope, constants)
 		if err != nil {
 			return err
 		}
@@ -46,6 +50,12 @@ _start:`)
 	mov r0, #0 
 	mov r7, #1 
 	svc #0%s`, "\n\n")
+		}
+	}
+
+	for index, used := range ac.usedBuiltins {
+		if used {
+			fmt.Print(MakeBuiltin(index))
 		}
 	}
 
@@ -60,7 +70,7 @@ _start:`)
 	return nil
 }
 
-func compileFromInstructionsAndSymbols(scope compiler.CompilationScope, constants []object.Object) error {
+func (ac *ArmCompiler) compileFromInstructionsAndSymbols(scope compiler.CompilationScope, constants []object.Object) error {
 	ins := scope.Instructions
 	symbols := scope.SymbolTable
 
@@ -71,7 +81,7 @@ func compileFromInstructionsAndSymbols(scope compiler.CompilationScope, constant
 	} else {
 		// preamble -> must open space for ALL local variables, including arguments and old lr
 		startOfTheStack = (len(symbols.GetAllLocalNames()) + 1)
-		fmt.Printf("	sub sp, sp, #%d\n\n", startOfTheStack*4)
+		fmt.Println(arm.MakeFunctionPreamble(startOfTheStack * 4))
 	}
 
 	for ip := 0; ip < len(ins); ip++ {
@@ -132,6 +142,8 @@ func compileFromInstructionsAndSymbols(scope compiler.CompilationScope, constant
 			if !ok {
 				return fmt.Errorf("builtin of index %d not found", builtinIndex)
 			}
+			// a builtin was used and must be in the compiled result
+			ac.usedBuiltins[int(builtinIndex)] = true
 			args = append(args, builtinName)
 
 		case code.OpReturn, code.OpReturnValue:

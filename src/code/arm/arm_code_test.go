@@ -325,8 +325,10 @@ func TestMake(t *testing.T) {
 			code.OpGetBuiltin,
 			0,
 			"_label",
-			[]any{},
+			[]any{"put"},
 			`L0_label:  @OpGetBuiltin
+	ldr r0, =put
+	push {r0}
 `,
 		},
 	}
