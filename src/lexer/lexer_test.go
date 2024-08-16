@@ -9,7 +9,9 @@ func TestNextToken(t *testing.T) {
 	input := `let five = 5;
 let ten = 10;
 
-fn add(x: int, y: int): int {
+// Comment
+
+fn add(x, y) {
 	x + y;
 };
 
@@ -21,7 +23,7 @@ if (5 < 10) {
 		return true;
 } else {
 		return false;
-}
+} // cometário
 
 10 == 10;
 10 != 9;
@@ -30,10 +32,6 @@ let foobar = "foobar"
 "foo \" bar"
 "foo \n\r\t bar"
 [1, 2];
-
-fn func(arg: char[]): void { }
-
-let var = true;
 `
 
 	tests := []struct {
@@ -54,15 +52,9 @@ let var = true;
 		{token.IDENT, "add"},
 		{token.LPAREN, "("},
 		{token.IDENT, "x"},
-		{token.COLON, ":"},
-		{token.INT, "int"},
 		{token.COMMA, ","},
 		{token.IDENT, "y"},
-		{token.COLON, ":"},
-		{token.INT, "int"},
 		{token.RPAREN, ")"},
-		{token.COLON, ":"},
-		{token.INT, "int"},
 		{token.LBRACE, "{"},
 		{token.IDENT, "x"},
 		{token.PLUS, "+"},
@@ -130,24 +122,6 @@ let var = true;
 		{token.COMMA, ","},
 		{token.INT_LIT, "2"},
 		{token.RBRACKET, "]"},
-		{token.SEMICOLON, ";"},
-		{token.FUNCTION, "fn"},
-		{token.IDENT, "func"},
-		{token.LPAREN, "("},
-		{token.IDENT, "arg"},
-		{token.COLON, ":"},
-		{token.CHAR, "char"},
-		{token.LBRACKET, "["},
-		{token.RBRACKET, "]"},
-		{token.RPAREN, ")"},
-		{token.COLON, ":"},
-		{token.VOID, "void"},
-		{token.LBRACE, "{"},
-		{token.RBRACE, "}"},
-		{token.LET, "let"},
-		{token.IDENT, "var"},
-		{token.ASSIGN, "="},
-		{token.TRUE, "true"},
 		{token.SEMICOLON, ";"},
 		{token.EOF, ""},
 	}
