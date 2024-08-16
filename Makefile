@@ -1,9 +1,5 @@
-ifeq ($(OS),Windows_NT)
-	EXECUTABLE_EXTENSION := .exe
-endif
-
 # buids the Marmoset compiler
-bin/marmoset$(EXECUTABLE_EXTENSION) : src/*.go src/**/*.go src/**/**/*.go
+bin/marmoset : src/*.go src/**/*.go src/**/**/*.go
 	cd src && go build -o ../$@ main.go
 
 # cleans Go module cache
@@ -11,7 +7,8 @@ clean :
 	cd src && go clean -modcache
 
 # builds the assembly examples using the Marmoset compiler
-examples/asm/%.s : bin/marmoset$(EXECUTABLE_EXTENSION) examples/%.marm
+examples/asm/%.s : bin/marmoset examples/%.marm
+	if [ ! -d examples/asm ]; then mkdir examples/asm; fi
 	./$^ > $@
 
 # builds the binary from an assembler source
@@ -37,6 +34,7 @@ gdb-% : examples/bin/%.out
 		-ex 'layout split' \
 		-ex 'layout regs'
 
+# runs an example's elf file
 run-% : examples/bin/%.out
 	./$?
 	
