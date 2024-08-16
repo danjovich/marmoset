@@ -1,0 +1,4 @@
+fn putintln(i) {
+  putint(i);
+  put(10);
+}

@@ -63,6 +63,11 @@ L0_get: @get
 		Source:       makeAsm("putint"),
 		UsedBuiltins: []string{"put"},
 	},
+	{
+		Name:         "putintln",
+		Source:       makeAsm("putintln"),
+		UsedBuiltins: []string{"put", "putint"},
+	},
 }
 
 func MakeBuiltin(index int) string {

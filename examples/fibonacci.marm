@@ -10,11 +10,8 @@ fn fibonacci(x) {
   }
 };
 
-putint(fibonacci(7));
-put(10);
+putintln(fibonacci(7));
 
-putint(fibonacci(1));
-put(10);
+putintln(fibonacci(1));
 
-putint(fibonacci(15));
-put(10);
+putintln(fibonacci(15));

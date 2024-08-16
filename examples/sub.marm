@@ -7,5 +7,4 @@ fn sub(a, b) {
 
 let c = sub(a, b);
 
-putint(c);
-put(10);
+putintln(c);
