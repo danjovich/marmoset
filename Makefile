@@ -37,5 +37,3 @@ gdb-% : examples/bin/%.out
 # runs an example's elf file
 run-% : examples/bin/%.out
 	./$?
-	
-
