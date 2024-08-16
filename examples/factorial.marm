@@ -5,4 +5,5 @@ fn factorial(n) {
   return factorial(n - 1) * n
 }
 
-factorial(10)
+putint(factorial(10));
+put(10);

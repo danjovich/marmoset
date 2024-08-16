@@ -1,0 +1,13 @@
+fn putint(i) {
+  if (i < 0) {
+    put(45);
+    let i = -i;
+  }
+
+  if (i/10) {
+    putint(i/10);
+  }
+
+  put((i % 10) + 48);
+}
+
