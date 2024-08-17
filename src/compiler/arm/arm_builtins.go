@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"marmoset/code"
 	"marmoset/code/arm"
+	"marmoset/compiler"
 )
 
 // will be used to embed assembly files in the same directory
@@ -13,14 +14,13 @@ import (
 var asm embed.FS
 
 type Builtin struct {
-	Name         string
 	Source       string
 	UsedBuiltins []string // other builtins used by this one
 }
 
-var Builtins = []Builtin{
+var Builtins = map[string]Builtin{
 	// puts a char to stdout
-	{Name: "put",
+	"put": {
 		// makes the syscall, restores lr and returns
 		Source: fmt.Sprintf(`put:
 %s
@@ -39,7 +39,7 @@ L0_put: @put
 		UsedBuiltins: []string{},
 	},
 	// gets a char from stdin
-	{Name: "get",
+	"get": {
 		// makes the syscall, restores lr and returns
 		Source: fmt.Sprintf(`get:
 %s
@@ -58,25 +58,23 @@ L0_get: @get
 	mov r2, #2`), makeReturn("get", 2, true)),
 		UsedBuiltins: []string{},
 	},
-	{
-		Name:         "putint",
+	"putint": {
 		Source:       makeAsm("putint"),
 		UsedBuiltins: []string{"put"},
 	},
-	{
-		Name:         "putintln",
+	"putintln": {
 		Source:       makeAsm("putintln"),
 		UsedBuiltins: []string{"put", "putint"},
 	},
 }
 
 func MakeBuiltin(index int) string {
-	return Builtins[index].Source
+	return Builtins[compiler.Builtins[index]].Source
 }
 
 func GetBuiltinIndex(name string) int {
-	for index, builtin := range Builtins {
-		if builtin.Name == name {
+	for index, builtin := range compiler.Builtins {
+		if builtin == name {
 			return index
 		}
 	}
