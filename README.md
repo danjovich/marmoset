@@ -92,11 +92,11 @@ if (x < y) {
 let a = if (true) {5;} // a recebe 5
 
 let b = if (true) {
-	if (false) {
-		10;
-	} else {
-		20;
-	}
+  if (false) {
+    10;
+  } else {
+    20;
+  }
 } // b recebe 20
 ```
 
