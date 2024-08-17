@@ -1,3 +1,4 @@
+// ESSE EXEMPLO NÂO FUNCIONA AGORA QUE putint É BUILTIN
 fn putint(i) {
   if (i < 0) {
     put(45);

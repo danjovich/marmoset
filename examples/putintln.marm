@@ -1,3 +1,4 @@
+// ESSE EXEMPLO NÂO FUNCIONA AGORA QUE putintln É BUILTIN
 fn putintln(i) {
   putint(i);
   put(10);
