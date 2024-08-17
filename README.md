@@ -6,7 +6,7 @@ Já que a linguagem implementada no livro se chama "monkey", o nome da linguagem
 
 ## Como usar
 
-Para compilar o compilador, basta rodar `make`. É necessário ter o copilador de go, com versão >=1.20 instalado.
+Para compilar o compilador, basta rodar `make`. É necessário ter o copilador de go, com versão >=1.20 instalado. Para instalar o compilador de Go, basta seguir as instruções no [site oficial](https://go.dev/doc/install).
 
 Até o momento, o compilador apenas imprime na tela o assembly gerado a partir do código fonte. Para gerar um executável ELF, então, é necessário usar o `make`.
 
@@ -131,12 +131,12 @@ Foram implementadas outras funções:
   ```
   fn putint(i) {
     if (i < 0) {
-    put(45);
-    let i = -i;
+      put(45);
+      let i = -i;
     }
 
     if (i/10) {
-    putint(i/10);
+      putint(i/10);
     }
 
     put((i % 10) + 48);
