@@ -33,6 +33,10 @@ func (l *Lexer) NextToken() token.Token {
 
 	l.skipWhitespace()
 
+	// tokens should not be advanced at the end of this method
+	// on recursive calls
+	advanceTokensAtEnd := true
+
 	switch l.ch {
 	case '=':
 		if l.peekChar() == '=' {
@@ -61,6 +65,7 @@ func (l *Lexer) NextToken() token.Token {
 			// ignore comments until \n
 			l.skipComment()
 			tok = l.NextToken()
+			advanceTokensAtEnd = false
 		} else {
 			tok = newToken(token.SLASH, l.ch)
 		}
@@ -99,7 +104,10 @@ func (l *Lexer) NextToken() token.Token {
 		}
 	}
 
-	l.readChar()
+	if advanceTokensAtEnd {
+		l.readChar()
+	}
+
 	return tok
 }
 
