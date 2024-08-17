@@ -41,8 +41,6 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.FALSE, p.parseBoolean)
 	p.registerPrefix(token.LPAREN, p.parseGroupedExpression)
 	p.registerPrefix(token.IF, p.parseIfExpression)
-	p.registerPrefix(token.STRING_LIT, p.parseStringLiteral)
-	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)
 
 	// associate infix tokens with parsing functions
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
@@ -56,8 +54,6 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.LT, p.parseInfixExpression)
 	p.registerInfix(token.GT, p.parseInfixExpression)
 	p.registerInfix(token.LPAREN, p.parseCallExpression)
-	// indexing is treated as a prefix expression
-	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
 
 	// Read two tokens, so curToken and peekToken are both set
 	p.nextToken()
@@ -234,7 +230,6 @@ var precedences = map[token.TokenType]int{
 	token.PERCENT:  PRODUCT,
 	token.ASTERISK: PRODUCT,
 	token.LPAREN:   CALL,
-	token.LBRACKET: INDEX,
 }
 
 func (p *Parser) peekPrecedence() int {
@@ -470,7 +465,7 @@ func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
 	return exp
 }
 
-// expression lists (like arguments of a function or arrays)
+// expression lists (like arguments of a function)
 func (p *Parser) parseExpressionList(end token.TokenType) []ast.Expression {
 	list := []ast.Expression{}
 
@@ -493,32 +488,4 @@ func (p *Parser) parseExpressionList(end token.TokenType) []ast.Expression {
 	}
 
 	return list
-}
-
-// string literals
-func (p *Parser) parseStringLiteral() ast.Expression {
-	return &ast.StringLiteral{Token: p.curToken, Value: p.curToken.Literal}
-}
-
-// array literals
-func (p *Parser) parseArrayLiteral() ast.Expression {
-	array := &ast.ArrayLiteral{Token: p.curToken}
-
-	array.Elements = p.parseExpressionList(token.RBRACKET)
-
-	return array
-}
-
-// index expressions
-func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
-	exp := &ast.IndexExpression{Token: p.curToken, Left: left}
-
-	p.nextToken()
-	exp.Index = p.parseExpression(LOWEST)
-
-	if !p.expectPeek(token.RBRACKET) {
-		return nil
-	}
-
-	return exp
 }

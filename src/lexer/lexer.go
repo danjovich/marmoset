@@ -1,7 +1,6 @@
 package lexer
 
 import (
-	"bytes"
 	"marmoset/token"
 )
 
@@ -73,8 +72,6 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.GT, l.ch)
 	case ';':
 		tok = newToken(token.SEMICOLON, l.ch)
-	case ':':
-		tok = newToken(token.COLON, l.ch)
 	case ',':
 		tok = newToken(token.COMMA, l.ch)
 	case '{':
@@ -85,13 +82,6 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.LPAREN, l.ch)
 	case ')':
 		tok = newToken(token.RPAREN, l.ch)
-	case '"':
-		tok.Type = token.STRING_LIT
-		tok.Literal = l.readString()
-	case '[':
-		tok = newToken(token.LBRACKET, l.ch)
-	case ']':
-		tok = newToken(token.RBRACKET, l.ch)
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF
@@ -138,7 +128,7 @@ func (l *Lexer) skipWhitespace() {
 }
 
 func (l *Lexer) skipComment() {
-	for l.peekChar() != '\n' {
+	for l.ch != '\n' && l.ch != 0 {
 		l.readChar()
 	}
 }
@@ -154,35 +144,6 @@ func (l *Lexer) readNumber() string {
 
 func isDigit(ch byte) bool {
 	return '0' <= ch && ch <= '9'
-}
-
-// strings
-func (l *Lexer) readString() string {
-	literalBuff := bytes.NewBufferString("")
-
-	for {
-		l.readChar()
-
-		if l.ch == '\\' {
-			l.readChar()
-
-			switch l.ch {
-			case 'n':
-				l.ch = '\n'
-			case 't':
-				l.ch = '\t'
-			case 'r':
-				l.ch = '\r'
-			}
-		} else if l.ch == '"' || l.ch == 0 {
-			// EOF could be an error
-			break
-		}
-
-		literalBuff.WriteByte(l.ch)
-	}
-
-	return literalBuff.String()
 }
 
 func (l *Lexer) peekChar() byte {

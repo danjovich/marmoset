@@ -238,33 +238,33 @@ func TestMake(t *testing.T) {
 	str r0, [r1]
 `,
 		},
-		{
-			code.OpArray,
-			0,
-			"_label",
-			[]any{3},
-			`L0_label:  @OpArray
-	mov r0, #3
-	push {r0}
-	sub r0, sp, #4
-	push {r0}
-`,
-		},
-		{
-			code.OpIndex,
-			0,
-			"_label",
-			[]any{},
-			`L0_label:  @OpIndex
-	pop {r3} 
-	ldr r0, [r3, #4]
-	ldr r1, [r3, #8]
-	sub r2, r1, r0
-	sub r2, r2, #1
-	ldr r0, [sp, r2, lsl #2]
-	push {r0}
-`,
-		},
+		// 		{
+		// 			code.OpArray,
+		// 			0,
+		// 			"_label",
+		// 			[]any{3},
+		// 			`L0_label:  @OpArray
+		// 	mov r0, #3
+		// 	push {r0}
+		// 	sub r0, sp, #4
+		// 	push {r0}
+		// `,
+		// 		},
+		// 		{
+		// 			code.OpIndex,
+		// 			0,
+		// 			"_label",
+		// 			[]any{},
+		// 			`L0_label:  @OpIndex
+		// 	pop {r3}
+		// 	ldr r0, [r3, #4]
+		// 	ldr r1, [r3, #8]
+		// 	sub r2, r1, r0
+		// 	sub r2, r2, #1
+		// 	ldr r0, [sp, r2, lsl #2]
+		// 	push {r0}
+		// `,
+		// 		},
 		{
 			code.OpCall,
 			0,

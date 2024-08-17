@@ -15,10 +15,8 @@ const (
 	EOF     = "EOF"
 
 	// Identifiers + literals
-	IDENT      = "IDENT"   // add, foobar, x, y, ...
-	INT_LIT    = "INT_LIT" // 1, 2, 3, -1, ...
-	STRING_LIT = "STRING_LIT"
-	CHAR_LIT   = "CHAR_LIT"
+	IDENT   = "IDENT"   // add, foobar, x, y, ...
+	INT_LIT = "INT_LIT" // 1, 2, 3, -1, ...
 
 	// Operators
 	ASSIGN   = "="
@@ -38,15 +36,11 @@ const (
 	// Delimiters
 	COMMA     = ","
 	SEMICOLON = ";"
-	COLON     = ":"
 
 	LPAREN = "("
 	RPAREN = ")"
 	LBRACE = "{"
 	RBRACE = "}"
-
-	LBRACKET = "["
-	RBRACKET = "]"
 
 	// Keywords
 	FUNCTION = "FUNCTION"

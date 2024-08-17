@@ -123,38 +123,6 @@ func Make(op code.Opcode, index int, scopeName string, operands ...any) (string,
 	str r0, [r1]
 `, label, name), nil
 
-	case code.OpArray:
-		if len(operands) != 1 {
-			return "", fmt.Errorf("OpArray should have only one operand")
-		}
-		length := operands[0]
-		// arrays must push their length and memory location
-		return fmt.Sprintf(`%s:  @OpArray
-	mov r0, #%d
-	push {r0}
-	sub r0, sp, #4
-	push {r0}
-`, label, length), nil
-
-	case code.OpIndex:
-		if len(operands) != 0 {
-			return "", fmt.Errorf("OpIndex should not have any operands")
-		}
-		// r3 = location of array
-		// r0 = index, r1 = length
-		// r2 = length - index - 1 // because its zero-indexed
-		// r0 = mem[sp + r2 * 4] // same as r0 = arr[index]
-		// return r0
-		return fmt.Sprintf(`%s:  @OpIndex
-	pop {r3} 
-	ldr r0, [r3, #4]
-	ldr r1, [r3, #8]
-	sub r2, r1, r0
-	sub r2, r2, #1
-	ldr r0, [sp, r2, lsl #2]
-	push {r0}
-`, label), nil
-
 	case code.OpCall:
 		if len(operands) != 1 {
 			return "", fmt.Errorf("OpCall should have only one operand")

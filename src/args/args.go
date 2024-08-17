@@ -7,16 +7,13 @@ import (
 )
 
 const (
-	VERBOSE     = "-v"
-	VERBOSE_V   = "--verbose"
-	INTERPRET   = "-i"
-	INTERPRET_V = "--interpret"
+	VERBOSE   = "-v"
+	VERBOSE_V = "--verbose"
 )
 
 type Args struct {
-	Verbose        bool
-	UseInterpreter bool
-	Program        string
+	Verbose bool
+	Program string
 }
 
 func NewArgs() (*Args, error) {
@@ -24,28 +21,28 @@ func NewArgs() (*Args, error) {
 
 	argsWithoutProg := os.Args[1:]
 
-	if len(argsWithoutProg) > 0 {
-		value := ""
-		r := regexp.MustCompile(`^\-{1,2}[^\-]+`)
+	if len(argsWithoutProg) == 0 {
+		return nil, fmt.Errorf("the path to a Marmoset source must be passed as the last argument")
+	}
 
-		lastIndex := len(argsWithoutProg) - 1
-		if !r.MatchString(argsWithoutProg[lastIndex]) {
-			args.Program = argsWithoutProg[lastIndex]
-			argsWithoutProg = argsWithoutProg[:lastIndex]
+	value := ""
+	r := regexp.MustCompile(`^\-{1,2}[^\-]+`)
+
+	lastIndex := len(argsWithoutProg) - 1
+	args.Program = argsWithoutProg[lastIndex]
+	argsWithoutProg = argsWithoutProg[:lastIndex]
+
+	for i, arg := range argsWithoutProg {
+		if len(argsWithoutProg) > i+1 {
+			match := r.MatchString(argsWithoutProg[i+1])
+			if !match {
+				value = argsWithoutProg[i+1]
+			}
 		}
 
-		for i, arg := range argsWithoutProg {
-			if len(argsWithoutProg) > i+1 {
-				match := r.MatchString(argsWithoutProg[i+1])
-				if !match {
-					value = argsWithoutProg[i+1]
-				}
-			}
-
-			err := args.parseArg(arg, value)
-			if err != nil {
-				return nil, err
-			}
+		err := args.parseArg(arg, value)
+		if err != nil {
+			return nil, err
 		}
 	}
 
@@ -60,12 +57,6 @@ func (args *Args) parseArg(arg string, value string) error {
 			return err
 		}
 		args.Verbose = true
-	case INTERPRET, INTERPRET_V:
-		err := assertHasNoValue(arg, value)
-		if err != nil {
-			return err
-		}
-		args.UseInterpreter = true
 	default:
 		return fmt.Errorf("unknown argument: %s", arg)
 	}

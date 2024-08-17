@@ -23,15 +23,10 @@ if (5 < 10) {
 		return true;
 } else {
 		return false;
-} // cometário
+} // comment
 
 10 == 10;
 10 != 9;
-let foobar = "foobar"
-"foo bar"
-"foo \" bar"
-"foo \n\r\t bar"
-[1, 2];
 `
 
 	tests := []struct {
@@ -110,19 +105,6 @@ let foobar = "foobar"
 		{token.NOT_EQ, "!="},
 		{token.INT_LIT, "9"},
 		{token.SEMICOLON, ";"},
-		{token.LET, "let"},
-		{token.IDENT, "foobar"},
-		{token.ASSIGN, "="},
-		{token.STRING_LIT, "foobar"},
-		{token.STRING_LIT, "foo bar"},
-		{token.STRING_LIT, "foo \" bar"},
-		{token.STRING_LIT, "foo \n\r\t bar"},
-		{token.LBRACKET, "["},
-		{token.INT_LIT, "1"},
-		{token.COMMA, ","},
-		{token.INT_LIT, "2"},
-		{token.RBRACKET, "]"},
-		{token.SEMICOLON, ";"},
 		{token.EOF, ""},
 	}
 
@@ -132,8 +114,8 @@ let foobar = "foobar"
 		tok := l.NextToken()
 
 		if tok.Type != tt.expectedType {
-			t.Fatalf("tests[%d] - token type wrong. expected=%q, got=%q",
-				i, tt.expectedType, tok.Type)
+			t.Fatalf("tests[%d] - token type wrong. expected=%q (literal %q), got=%q (literal %q)",
+				i, tt.expectedType, tt.expectedLiteral, tok.Type, tok.Literal)
 		}
 
 		if tok.Literal != tt.expectedLiteral {

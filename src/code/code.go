@@ -39,10 +39,6 @@ const (
 	// manipulation of the globals store (identifiers)
 	OpGetGlobal
 	OpSetGlobal
-	// pushes array last values on the stack (passes length as an argument)
-	OpArray
-	// index operator that applies the last stack value as index to the second-last stack value (object)
-	OpIndex
 	// calls function with (constant pool) index at the top of the stack
 	OpCall
 	// returns from a function with a return value (last value in the stack)
@@ -84,8 +80,6 @@ var definitions = map[Opcode]*Definition{
 	OpNull:          {"OpNull", []int{}},
 	OpGetGlobal:     {"OpGetGlobal", []int{2}},
 	OpSetGlobal:     {"OpSetGlobal", []int{2}},
-	OpArray:         {"OpArray", []int{2}},
-	OpIndex:         {"OpIndex", []int{}},
 	OpCall:          {"OpCall", []int{1}},
 	OpReturnValue:   {"OpReturnValue", []int{}},
 	OpReturn:        {"OpReturn", []int{}},

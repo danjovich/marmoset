@@ -7,7 +7,6 @@ import (
 	"marmoset/compiler"
 	"marmoset/object"
 	"slices"
-	"strconv"
 )
 
 type ArmCompiler struct {
@@ -115,11 +114,6 @@ func (ac *ArmCompiler) compileFromInstructionsAndSymbols(scope compiler.Compilat
 			}
 			args = append(args, globalName)
 
-		case code.OpArray:
-			numElements := int(code.ReadUint16(ins[ip+1:]))
-			ip += 2
-			args = append(args, numElements)
-
 		case code.OpCall:
 			numArgs := code.ReadUint8(ins[ip+1:])
 			args = append(args, int(numArgs))
@@ -175,18 +169,18 @@ func generateConstantArgs(constant object.Object) ([]interface{}, error) {
 		result := fmt.Sprintf("mov r0, #%d", constant.Value)
 		return []interface{}{result}, nil
 
-	case *object.String:
-		asciiValues, err := strconv.Atoi(constant.Value)
-		if err != nil {
-			return []interface{}{}, err
-		}
-		result := []interface{}{}
-		for asciiValues != 0 {
-			asciiValue := asciiValues % 0xFF
-			result = append(result, fmt.Sprintf("mov r0, #%d", asciiValue))
-			asciiValues <<= 8
-		}
-		return result, nil
+		// case *object.String:
+		// 	asciiValues, err := strconv.Atoi(constant.Value)
+		// 	if err != nil {
+		// 		return []interface{}{}, err
+		// 	}
+		// 	result := []interface{}{}
+		// 	for asciiValues != 0 {
+		// 		asciiValue := asciiValues % 0xFF
+		// 		result = append(result, fmt.Sprintf("mov r0, #%d", asciiValue))
+		// 		asciiValues <<= 8
+		// 	}
+		// 	return result, nil
 	}
 
 	return []interface{}{}, fmt.Errorf("invalid type %T for constant", constant.Type())

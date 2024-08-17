@@ -57,15 +57,6 @@ func New() *Compiler {
 	}
 }
 
-// For preserving state between REPL runs
-func NewWithState(s *SymbolTable, constants []object.Object) *Compiler {
-	compiler := New()
-	compiler.SymbolTable = s
-	compiler.AllScopes[0].SymbolTable = s
-	compiler.Constants = constants
-	return compiler
-}
-
 func (c *Compiler) Compile(node ast.Node) error {
 	switch node := node.(type) {
 	case *ast.Program:
@@ -221,32 +212,6 @@ func (c *Compiler) Compile(node ast.Node) error {
 			return fmt.Errorf("undefined variable %s", node.Value)
 		}
 		c.loadSymbol(symbol)
-
-	case *ast.StringLiteral:
-		str := &object.String{Value: node.Value}
-		c.emit(code.OpConstant, c.addConstant(str))
-
-	case *ast.ArrayLiteral:
-		for _, el := range node.Elements {
-			// compile each element...
-			err := c.Compile(el)
-			if err != nil {
-				return err
-			}
-		}
-		// ...and then compile the array
-		c.emit(code.OpArray, len(node.Elements))
-
-	case *ast.IndexExpression:
-		err := c.Compile(node.Left)
-		if err != nil {
-			return err
-		}
-		err = c.Compile(node.Index)
-		if err != nil {
-			return err
-		}
-		c.emit(code.OpIndex)
 
 	case *ast.FunctionStatement:
 		// defines symbol before compiling function to allow recursive functions to know about their own existence
