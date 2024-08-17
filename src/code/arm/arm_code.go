@@ -29,7 +29,6 @@ func Make(op code.Opcode, index int, scopeName string, operands ...any) (string,
 		return makeBinaryOperation(op, label), nil
 
 	case code.OpPop:
-		// TODO: pop of arrays (maybe an "array pointer", similar to stack pointer, or check previous instruction on compiler)
 		if len(operands) != 0 {
 			return "", fmt.Errorf("OpPop should not have any operands")
 		}
@@ -217,7 +216,6 @@ func Make(op code.Opcode, index int, scopeName string, operands ...any) (string,
 `, label, (localIndex+1)*4), nil
 
 	case code.OpGetBuiltin:
-		// TODO: implement builtins get and call
 		if len(operands) != 1 {
 			return "", fmt.Errorf("OpGetBuiltin should have only one operand")
 		}

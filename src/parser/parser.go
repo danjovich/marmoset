@@ -216,7 +216,6 @@ const (
 	PRODUCT     // *
 	PREFIX      // -X or !X
 	CALL        // myFunction(X)
-	INDEX       // array[index]
 )
 
 var precedences = map[token.TokenType]int{
