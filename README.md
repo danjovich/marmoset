@@ -42,6 +42,12 @@ Por exemplo, para o programa `fibonacci.marm` fornecido, que imprime na tela o s
 610
 ```
 
+É possível, também, rodar diretamente um programa (com extensão .marm e dentro da pasta examples) com um comando só `make run-<nome_do_programa>`, mas o Make irá apagar o assembly e o binário gerados depois (se você não os tiver gerado previamente). Por exemplo, para rodar o `fibonacci.marm` dessa forma, basta rodar:
+
+```bash
+make run-fibonacci
+```
+
 ## A linguagem
 
 ### Declaração e atribuição de variáveis
