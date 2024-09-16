@@ -1,40 +1,40 @@
-# Marmoset: Uma linguagem de programação compilada para ARM
+# Marmoset: A compiled programming language for ARM
 
-Essa é uma linguagem de programação simples inspirada na implementada no livro [_Writing A Compiler In Go_](https://compilerbook.com/), escrito por Thorsten Ball.
+This is a simple programming language inspired by the one implemented in the book [_Writing A Compiler In Go_](https://compilerbook.com/), written by Thorsten Ball.
 
-Já que a linguagem implementada no livro se chama "monkey", o nome da linguagem vem do fato de que _marmoset_ (sagui) é uma espécie de macaco e a linguagem é compilada para ARM (mARMoset).
+Since the language implemented in the book is called "monkey," the name of this language comes from the fact that _marmoset_ is a type of monkey, and the language is compiled for ARM (mARMoset).
 
-## Como usar
+## How to use it
 
-Para compilar o compilador, basta rodar `make`. É necessário ter o copilador de go, com versão >=1.20 instalado. Para instalar o compilador de Go, basta seguir as instruções no [site oficial](https://go.dev/doc/install).
+To compile the compiler, simply run `make`. You need to have a Go compiler installed, version >=1.20. To install the Go compiler, just follow the instructions on the [official website](https://go.dev/doc/install).
 
-Até o momento, o compilador apenas imprime na tela o assembly gerado a partir do código fonte. Para gerar um executável ELF, então, é necessário usar o `make`.
+Currently, the Marmoset compiler only prints the assembly generated from the source code. To generate an ELF executable, you will need to use some recipes in the `Makefile`.
 
-Antes de gerar ps binários, é preciso ter instalados os binutils necessários. Se você está numa máquina com CPU amd64 e com o APT como package manager, é preciso rodar:
+Before generating the binaries, the necessary binutils must be installed. If you are on an amd64 machine with APT as the package manager, you need to run:
 
 ```bash
 sudo apt install binutils-arm-linux-gnueabihf binutils-arm-linux-gnueabihf-dbg
 ```
 
-Além disso, é necessário, em uma máquina amd64, instalar o qemu para AArch32 em modo usuário, isso pode ser feito com:
+Additionally, on an amd64 machine, you need to install qemu for AArch32 in user mode, which can be done with:
 
 ```bash
 sudo apt install qemu-user qemu-user-static
 ```
 
-Em seguida, para compilar um programa em Marmoset, basta colocar o arquivo .marm na pasta examples e rodar:
+Then, to compile a Marmoset program, simply place the `.marm` file in the examples folder and run:
 
 ```bash
-make examples/bin/<nome_do_programa>.out
+make examples/bin/<program_name>.out
 ```
 
-Para rodar o programa, então, basta rodar:
+To run the program, simply execute:
 
 ```bash
-./examples/bin/<nome_do_programa>.out
+./examples/bin/<program_name>.out
 ```
 
-Por exemplo, para o programa `fibonacci.marm` fornecido, que imprime na tela o sétimo, depois o primeiro, depois o 15º número da sequência de Fibonacci calculados através de uma função recursiva, a saída deve ser:
+For example, for the provided `fibonacci.marm` program, which prints the seventh, then the first, and then the 15th number in the Fibonacci sequence, calculated through a recursive function, the output should be:
 
 ```
 13
@@ -42,17 +42,17 @@ Por exemplo, para o programa `fibonacci.marm` fornecido, que imprime na tela o s
 610
 ```
 
-É possível, também, rodar diretamente um programa (com extensão .marm e dentro da pasta examples) com um comando só `make run-<nome_do_programa>`, mas o Make irá apagar o assembly e o binário gerados depois (se você não os tiver gerado previamente). Por exemplo, para rodar o `fibonacci.marm` dessa forma, basta rodar:
+It is also possible to run a program (with a `.marm` extension and inside the examples folder) directly with a single command `make run-<program_name>`, but `make` will delete the generated assembly and binary afterward (if they were not previously generated). For example, to run `fibonacci.marm` this way, simply run:
 
 ```bash
 make run-fibonacci
 ```
 
-## A linguagem
+## The language
 
-### Declaração e atribuição de variáveis
+### Variables declaration and assignment
 
-A declaração de variáveis deve ser feita com a palavra reservada `let`. Toda variável deve ser inicializada com um valor, não é possível simplesmente declará-las (por exemplo `let a;` não é uma expressão válida em Marmoset). A atribuição também ocorre com o `let`, e é permitido o shadowing, expressões idênticas podem atuar como declaração junto a atribuição ou apenas atribuição. Note que o ponto e vírgula (`;`) ao fim de cada expressão é opcional.
+Variables declaration must be done using the reserved keyword `let`. Every variable must be initialized with a value; it is not possible to simply declare them (e.g., `let a;` is not a valid expression in Marmoset). Assignment also occurs with `let`, and shadowing is allowed — identical expressions can act as both declaration and assignment or just assignment. Note that the semicolon (`;`) at the end of each expression is optional.
 
 ```
 let a = 1; 
@@ -61,32 +61,32 @@ let a = b;
 let c = true
 ```
 
-### Comentários
+### Comments
 
-Comentários podem ser feitos no estilo de C++:
+Comments can be written in C++ style:
 
 ```
-// comentário
+// comment
 ```
 
-### Funções
+### Functions
 
-A declaração de funções começa com a palavra reservada `fn` e a chamada ocorre como em C. Não é necessário declarar tipos de retorno ou dos parâmetros, tudo é tratado como inteiro ou booleano. Funções que não retornam nenhum valor explicitamente na verdade retornam `null` (que equivale a 0). Os retornos de função não precisam ser explícitos: se a última expressão a ser executada não for guardada em um identificador ou usada de alguma forma, o valor dela será retornado. Returns vazios (`return;`) não são permitidos.
+Function declaration starts with the reserved keyword `fn`, and function calls are similar to C. There is no need to declare return types or parameter types; everything is treated as either an integer or a boolean. Functions that do not explicitly return any value actually return `null` (equivalent to 0). Function returns do not need to be explicit: if the last expression to be executed is not stored in a variable or used in any way, its value will be returned. Empty returns (`return;`) are not allowed.
 
 ```
 fn identity(x) { x; }; 
-identity(7); // Retorna 7
+identity(7); // returns 7
 
 fn add(a, b) { a + b }; 
-add(1, 2); // retorna 3
+add(1, 2); // returns 3
 
 fn sub(a, b) { a - b }; 
-sub(1, 2); // retorna -1
+sub(1, 2); // returns -1
 ```
 
-### Condicionais
+### Conditionals
 
-Os condicionais em Marmoset são expressões, então eles retornam valores. Se o código dentro de um `if` (ou `else`) terminar com uma expressão sem atribuição, o valor dessa expressão será retornado, se não, o condicional retornará `null` (0).
+Conditionals in Marmoset are expressions, so they return values. If the code inside an `if` (or `else`) ends with an expression without assignment, the value of that expression will be returned; otherwise, the conditional will return `null` (0).
 
 ```
 if (x < y) { 
@@ -95,7 +95,7 @@ if (x < y) {
     w 
 }
 	
-let a = if (true) {5;} // a recebe 5
+let a = if (true) {5;} // a receives 5
 
 let b = if (true) {
   if (false) {
@@ -103,20 +103,20 @@ let b = if (true) {
   } else {
     20;
   }
-} // b recebe 20
+} // b receives 20
 ```
 
-### Precedência de Operadores
+### Operator Precedence
 
-A precedência de operadores é a mesma que a encontrada em outras linguagens, em ordem crescente:
-  * Comparação de igual (`==`) ou diferente (`!=`);
-  * Comparações de menor (`<`) ou maior (`>`);
-  * Somas e subtrações;
-  * Multiplicações, divisões e resto (`%`);
-  * Negação (`!x`) ou inversão de sinal (`-x`);
-  * Chamadas de funções.
+Operator precedence is the same as in most languages, in increasing order:
+  * Equality (`==`) or inequality (`!=`);
+  * Less than (`<`) or greater than (`>`);
+  * Addition and subtraction;
+  * Multiplication, division, and modulus (`%`);
+  * Negation (`!x`) or sign inversion (`-x`);
+  * Function calls.
 
-Nesses exemplos, é possível ver um pouco de como o compilador trata as precedências (o que é mostrado nos comentários é realmente o resultado que o parser irá gerar quando analisar a precedência):
+In these examples, you can see how the compiler handles precedences (the comments show the result that the parser will generate when analyzing precedence):
 
 ```
 3 + 4 * 5 == 3 * 1 + 4 * 5 
@@ -128,11 +128,11 @@ add(a + b + c * d / f + g % h * i)
 
 ### Builtins
 
-Foram implementadas outras funções:
+The following functions have been implemented:
 
-* `put`: Usa a chamada de sistema `write` do Linux para escrever um caractere na tela (isto é, no stdout). Como não há chars em Marmoset, ela deve receber um inteiro e portanto irá imprimir o caractere ASCII equivalente a esse inteiro.
-* `get`: Usa a chamada de sistema `read` do Linux para ler um caractere da tela (isto é, do stdin). Como não há chars em Marmoset, retorna um inteiro equivalente ao caractere ASCII digitado.
-* `putint`: Para facilitar a impressão de inteiros na tela, já que passar um inteiro para a função `put` irá imprimir o caractere ASCII equivalente, não o inteiro, essa função é fornecida. Ela foi implementada em Marmoset e compilada, e então quando for usada por um programa a rotina gerada em assembly é incluída no assembly do novo programa. A implementação dela em Marmoset é a seguinte (note que 45 é o valor do caractere ASCII “-” e 48 do “0”):
+* `put`: Uses the Linux `write` system call to print a character to the screen (i.e., to stdout). Since there are no chars in Marmoset, it must receive an integer and will print the ASCII character equivalent to that integer.
+* `get`: Uses the Linux `read` system call to read a character from the screen (i.e., from stdin). Since there are no chars in Marmoset, it returns an integer equivalent to the ASCII character entered.
+* `putint`: To simplify printing integers on the screen (since passing an integer to the `put` function will print the equivalent ASCII character, not the integer itself), this function is provided. It was implemented in Marmoset and compiled, so when it is used by a program, the generated assembly routine is included in the new program's assembly. Its implementation in Marmoset is as follows (note that 45 is the value of the ASCII character "-" and 48 of "0"):
 
   ```
   fn putint(i) {
@@ -149,7 +149,7 @@ Foram implementadas outras funções:
   }
   ```
 
-* `putintln`: Como a função `putint` não insere um `\n` depois de imprimir o inteiro, e é frequente que se queira fazer isso, foi implementada também essa função builtin, da seguinte forma (10 é `\n` em ASCII):
+* `putintln`: Since the `putint` function does not insert a newline (`\n`) after printing the integer, and it is often desired to do so, this builtin function was also implemented as follows (10 is `\n` in ASCII):
 
   ```
   fn putintln(i) {
